@@ -8,7 +8,7 @@
 PRODUCT_NAME = dcr_chemist
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.hhcl.dcrChemist
+PRODUCT_BUNDLE_IDENTIFIER = com.hhcl.dcrchemist
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2026 com.hhcl. All rights reserved.

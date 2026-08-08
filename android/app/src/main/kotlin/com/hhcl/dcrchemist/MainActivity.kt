@@ -1,4 +1,4 @@
-package com.hhcl.dcr_chemist
+package com.hhcl.dcrchemist
 
 import io.flutter.embedding.android.FlutterActivity
 
