@@ -55,38 +55,13 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // App Logo / Icon Header
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    gradient: AppColors.primaryGradient,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.3),
-                        blurRadius: 16,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.pin_drop_rounded,
-                    size: 44,
-                    color: Colors.white,
-                  ),
+                // App Logo Header
+                Image.asset(
+                  'assets/images/logo.png',
+                  height: 140,
+                  fit: BoxFit.contain,
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  'ChemTag',
-                  style: GoogleFonts.inter(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 12),
                 Text(
                   'DCR Chemist & Field Force Automation',
                   style: GoogleFonts.inter(

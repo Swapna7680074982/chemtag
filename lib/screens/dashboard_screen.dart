@@ -40,8 +40,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
       appBar: AppBar(
         title: Row(
           children: [
-            const Icon(Icons.pin_drop_rounded, size: 22, color: Colors.white),
-            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.all(3),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: Image.asset(
+                'assets/images/logo.png',
+                height: 24,
+                width: 24,
+                fit: BoxFit.contain,
+              ),
+            ),
+            const SizedBox(width: 10),
             Text(
               'ChemTag Mobile',
               style: GoogleFonts.inter(
