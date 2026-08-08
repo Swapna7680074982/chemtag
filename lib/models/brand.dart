@@ -19,6 +19,7 @@ class Brand {
       description: json['description'] ?? '',
     );
   }
+  
 
   Map<String, dynamic> toJson() => {
         'id': id,
