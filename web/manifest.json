@@ -1,11 +1,11 @@
 {
-    "name": "dcr_chemist",
-    "short_name": "dcr_chemist",
+    "name": "ChemTag",
+    "short_name": "ChemTag",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "ChemTag - DCR Chemist & Field Force Automation",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

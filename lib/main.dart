@@ -22,7 +22,7 @@ class ChemTagApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => DcrProvider()),
       ],
       child: MaterialApp(
-        title: 'ChemTag - DCR Chemist Mobile',
+        title: 'ChemTag',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         home: Consumer<AuthProvider>(

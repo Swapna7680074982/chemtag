@@ -31,40 +31,59 @@ class LocationDataResult {
 }
 
 class LocationHelper {
-  // Default mock coordinates (Connaught Place, New Delhi field location)
-  static final LocationDataResult _fallbackLocation = LocationDataResult(
-    latitude: 28.6139,
-    longitude: 77.2090,
-    accuracyMeters: 5.0,
-    timestamp: DateTime.now(),
-    isMockFallback: true,
-    errorMessage: 'Simulated field location (GPS hardware fallback)',
-  );
 
   static Future<LocationDataResult> getCurrentLocation() async {
     try {
       if (kIsWeb) {
-        return _fallbackLocation;
+        return LocationDataResult(
+          latitude: 28.6139,
+          longitude: 77.2090,
+          accuracyMeters: 5.0,
+          timestamp: DateTime.now(),
+          isMockFallback: true,
+          errorMessage: null, // Web uses fallback without blocking error
+        );
       }
 
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        debugPrint('Location services are disabled. Using fallback.');
-        return _fallbackLocation;
+        debugPrint('Location services are disabled.');
+        return LocationDataResult(
+          latitude: 0.0,
+          longitude: 0.0,
+          accuracyMeters: 0.0,
+          timestamp: DateTime.now(),
+          isMockFallback: true,
+          errorMessage: 'Location services are disabled. Please enable GPS in device settings.',
+        );
       }
 
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          debugPrint('Location permission denied. Using fallback.');
-          return _fallbackLocation;
+          debugPrint('Location permission denied.');
+          return LocationDataResult(
+            latitude: 0.0,
+            longitude: 0.0,
+            accuracyMeters: 0.0,
+            timestamp: DateTime.now(),
+            isMockFallback: true,
+            errorMessage: 'Location permission denied. Please allow location access to submit.',
+          );
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        debugPrint('Location permission permanently denied. Using fallback.');
-        return _fallbackLocation;
+        debugPrint('Location permission permanently denied.');
+        return LocationDataResult(
+          latitude: 0.0,
+          longitude: 0.0,
+          accuracyMeters: 0.0,
+          timestamp: DateTime.now(),
+          isMockFallback: true,
+          errorMessage: 'Location permission permanently denied. Please enable it in Settings.',
+        );
       }
 
       Position position = await Geolocator.getCurrentPosition(
@@ -82,14 +101,14 @@ class LocationHelper {
         isMockFallback: false,
       );
     } catch (e) {
-      debugPrint('Error getting GPS location: $e. Returning mock location.');
+      debugPrint('Error getting GPS location: $e');
       return LocationDataResult(
-        latitude: 28.6139 + (0.001 * (DateTime.now().second % 5)),
-        longitude: 77.2090 + (0.001 * (DateTime.now().minute % 5)),
-        accuracyMeters: 6.2,
+        latitude: 0.0,
+        longitude: 0.0,
+        accuracyMeters: 0.0,
         timestamp: DateTime.now(),
         isMockFallback: true,
-        errorMessage: e.toString(),
+        errorMessage: 'Failed to capture location: ${e.toString()}',
       );
     }
   }

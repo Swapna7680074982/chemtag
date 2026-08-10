@@ -269,6 +269,13 @@ class DcrProvider with ChangeNotifier {
       await captureLocation();
     }
 
+    // Enforce mandatory valid location (no error messages allowed for submission)
+    if (_currentLocation == null || _currentLocation!.errorMessage != null) {
+      _isSubmitting = false;
+      notifyListeners();
+      return false;
+    }
+
     final items = <DcrItem>[];
     _productQuantities.forEach((productId, qty) {
       if (qty > 0) {

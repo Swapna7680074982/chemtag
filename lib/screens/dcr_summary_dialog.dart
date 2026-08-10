@@ -383,6 +383,10 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
                       ),
                       const SizedBox(height: 16),
 
+                      // GPS Tagging Verification Card
+                      _buildLocationVerificationCard(context, dcrProvider),
+                      const SizedBox(height: 16),
+
                       // Optional Remarks Field
                       TextField(
                         controller: _notesController,
@@ -408,8 +412,12 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          onPressed:
-                              dcrProvider.isSubmitting ? null : _handleSubmit,
+                          onPressed: (dcrProvider.isSubmitting ||
+                                  dcrProvider.isCapturingLocation ||
+                                  dcrProvider.currentLocation == null ||
+                                  dcrProvider.currentLocation!.errorMessage != null)
+                              ? null
+                              : _handleSubmit,
                           child: dcrProvider.isSubmitting
                               ? const SizedBox(
                                   width: 20,
@@ -436,6 +444,179 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildLocationVerificationCard(BuildContext context, DcrProvider dcrProvider) {
+    if (dcrProvider.isCapturingLocation) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: AppColors.primaryLight,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.primaryBorder),
+        ),
+        child: Row(
+          children: [
+            const SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppColors.primary,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Acquiring precise GPS coordinates...',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final location = dcrProvider.currentLocation;
+
+    if (location == null) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.amber.shade50,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.amber.shade200),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.location_searching_rounded, color: Colors.amber.shade700, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'GPS location has not been captured.',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.amber.shade900,
+                ),
+              ),
+            ),
+            TextButton.icon(
+              onPressed: () => dcrProvider.captureLocation(),
+              icon: const Icon(Icons.refresh_rounded, size: 16),
+              label: const Text('Capture', style: TextStyle(fontSize: 11)),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.amber.shade900,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (location.errorMessage != null) {
+      return Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.dangerLight,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.danger.withValues(alpha: 0.3)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.location_off_rounded, color: AppColors.danger, size: 20),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'GPS Verification Failed',
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.danger,
+                    ),
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () => dcrProvider.captureLocation(),
+                  icon: const Icon(Icons.refresh_rounded, size: 16),
+                  label: const Text('Retry', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.danger,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Padding(
+              padding: const EdgeInsets.only(left: 32),
+              child: Text(
+                location.errorMessage!,
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  color: AppColors.danger,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Success State
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.successLight,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.location_on_rounded, color: AppColors.success, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'GPS Location Tagged & Verified',
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.success,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Coord: ${location.formattedCoordinates} (±${location.accuracyMeters.toStringAsFixed(1)}m)',
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: () => dcrProvider.captureLocation(),
+            icon: const Icon(Icons.refresh_rounded, size: 18, color: AppColors.success),
+            tooltip: 'Re-capture GPS',
+            constraints: const BoxConstraints(),
+            padding: EdgeInsets.zero,
+          ),
+        ],
       ),
     );
   }
