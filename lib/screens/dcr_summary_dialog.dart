@@ -132,20 +132,24 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
   @override
   Widget build(BuildContext context) {
     final dcrProvider = Provider.of<DcrProvider>(context);
-    final selectedEntries = dcrProvider.productQuantities.entries
-        .where((e) => e.value > 0)
-        .toList();
 
     // Group selected entries by stockist
     final Map<Stockist, List<MapEntry<String, int>>> groupedEntries = {};
     for (final entry in dcrProvider.productQuantities.entries) {
       if (entry.value <= 0) continue;
       final parts = entry.key.split(':');
-      final productId = parts[0];
       final stockistId = parts[1];
       final stockist = dcrProvider.allAvailableStockistsRaw.firstWhere(
         (s) => s.id == stockistId,
-        orElse: () => Stockist(id: stockistId, name: 'Unknown Stockist', code: ''),
+        orElse: () => Stockist(
+          id: stockistId,
+          name: 'Unknown Stockist',
+          code: '',
+          contactPerson: '',
+          phone: '',
+          address: '',
+          city: '',
+        ),
       );
       groupedEntries.putIfAbsent(stockist, () => []).add(entry);
     }

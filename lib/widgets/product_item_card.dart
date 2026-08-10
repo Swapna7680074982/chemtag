@@ -2,12 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/product.dart';
 import '../core/constants/app_colors.dart';
 import '../core/utils/formatters.dart';
-
-import 'package:flutter/material.dart';
-import '../models/product.dart';
 import '../models/stockist.dart';
-import '../core/constants/app_colors.dart';
-import '../core/utils/formatters.dart';
 
 class ProductItemCard extends StatelessWidget {
   final Product product;
@@ -155,7 +150,6 @@ class ProductItemCard extends StatelessWidget {
             const SizedBox(height: 8),
             ...availableSelectedStockists.map((stockist) {
               final qty = getQuantity(stockist.id);
-              final isItemQty = qty > 0;
 
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
