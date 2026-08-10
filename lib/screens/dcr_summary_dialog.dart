@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/auth_provider.dart';
 import '../providers/dcr_provider.dart';
+import '../models/stockist.dart';
+import '../models/product.dart';
 import '../core/constants/app_colors.dart';
 import '../core/utils/formatters.dart';
 
@@ -134,6 +136,20 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
         .where((e) => e.value > 0)
         .toList();
 
+    // Group selected entries by stockist
+    final Map<Stockist, List<MapEntry<String, int>>> groupedEntries = {};
+    for (final entry in dcrProvider.productQuantities.entries) {
+      if (entry.value <= 0) continue;
+      final parts = entry.key.split(':');
+      final productId = parts[0];
+      final stockistId = parts[1];
+      final stockist = dcrProvider.allAvailableStockistsRaw.firstWhere(
+        (s) => s.id == stockistId,
+        orElse: () => Stockist(id: stockistId, name: 'Unknown Stockist', code: ''),
+      );
+      groupedEntries.putIfAbsent(stockist, () => []).add(entry);
+    }
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
@@ -208,124 +224,182 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Section Header
-                      Row(
-                        children: [
-                          const Text(
-                            'Selected Products Catalog',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          const Spacer(),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryLight,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              '${selectedEntries.length} Items',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ),
-                        ],
+                      const Text(
+                        'Selected Products by Distributor',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                       const SizedBox(height: 12),
 
-                      // Products Card List
-                      ...selectedEntries.map((entry) {
-                        final product = dcrProvider.products.firstWhere(
-                          (p) => p.id == entry.key,
-                          orElse: () => dcrProvider.products.first,
-                        );
-                        double itemTotal = product.ptr * entry.value;
+                      // Grouped Products
+                      ...groupedEntries.entries.map((group) {
+                        final stockist = group.key;
+                        final entries = group.value;
+
+                        // Calculate stockist subtotal
+                        double stockistSubtotal = 0.0;
+                        for (final entry in entries) {
+                          final parts = entry.key.split(':');
+                          final productId = parts[0];
+                          final product = dcrProvider.allProductsForSelectedStockists.firstWhere(
+                            (p) => p.id == productId,
+                            orElse: () => Product(
+                              id: productId,
+                              name: 'Unknown Product',
+                              skuCode: '',
+                              brandId: '',
+                              brandName: '',
+                              packSize: '',
+                              ptr: 0.0,
+                              mrp: 0.0,
+                              availableStockistIds: [],
+                            ),
+                          );
+                          stockistSubtotal += product.ptr * entry.value;
+                        }
 
                         return Container(
-                          margin: const EdgeInsets.only(bottom: 10),
+                          margin: const EdgeInsets.only(bottom: 14),
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: AppColors.background,
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.border),
+                            border: Border.all(color: AppColors.border, width: 1.2),
                           ),
-                          child: Row(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                              // Stockist Header
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryLight,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
                                   children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primaryLight,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
+                                    const Icon(Icons.local_shipping, size: 16, color: AppColors.primary),
+                                    const SizedBox(width: 6),
+                                    Expanded(
                                       child: Text(
-                                        product.brandName,
+                                        '${stockist.name} (${stockist.code})',
                                         style: const TextStyle(
-                                          fontSize: 10,
+                                          fontSize: 12,
                                           fontWeight: FontWeight.bold,
-                                          color: AppColors.primary,
+                                          color: AppColors.primaryDark,
                                         ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      product.name,
-                                      style: const TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.textPrimary,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      'Pack: ${product.packSize} • PTR: ${AppFormatters.formatCurrency(product.ptr)}',
-                                      style: const TextStyle(
-                                        fontSize: 11,
-                                        color: AppColors.textMuted,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(8),
-                                      border:
-                                          Border.all(color: AppColors.border),
-                                    ),
-                                    child: Text(
-                                      'Qty: ${entry.value}',
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.textPrimary,
+                              const SizedBox(height: 10),
+                              // Products List under this stockist
+                              ...entries.map((entry) {
+                                final parts = entry.key.split(':');
+                                final productId = parts[0];
+                                final product = dcrProvider.allProductsForSelectedStockists.firstWhere(
+                                  (p) => p.id == productId,
+                                  orElse: () => Product(
+                                    id: productId,
+                                    name: 'Unknown Product',
+                                    skuCode: '',
+                                    brandId: '',
+                                    brandName: '',
+                                    packSize: '',
+                                    ptr: 0.0,
+                                    mrp: 0.0,
+                                    availableStockistIds: [],
+                                  ),
+                                );
+                                double itemTotal = product.ptr * entry.value;
+
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 6),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              product.name,
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.textPrimary,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              'Pack: ${product.packSize} • PTR: ${AppFormatters.formatCurrency(product.ptr)}',
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                color: AppColors.textMuted,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
+                                      const SizedBox(width: 8),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8, vertical: 3),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.background,
+                                              borderRadius: BorderRadius.circular(6),
+                                              border: Border.all(color: AppColors.border),
+                                            ),
+                                            child: Text(
+                                              'Qty: ${entry.value}',
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.textPrimary,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            AppFormatters.formatCurrency(itemTotal),
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.success,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
+                              const Divider(height: 16),
+                              // Subtotal Row
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  const Text(
+                                    'Distributor Subtotal: ',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textSecondary,
                                     ),
                                   ),
-                                  const SizedBox(height: 6),
                                   Text(
-                                    AppFormatters.formatCurrency(itemTotal),
+                                    AppFormatters.formatCurrency(stockistSubtotal),
                                     style: const TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
-                                      color: AppColors.success,
+                                      color: AppColors.primaryDark,
                                     ),
                                   ),
                                 ],

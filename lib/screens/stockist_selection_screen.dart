@@ -6,8 +6,35 @@ import '../widgets/stockist_chip.dart';
 import '../core/constants/app_colors.dart';
 import 'product_catalog_screen.dart';
 
-class StockistSelectionScreen extends StatelessWidget {
+class StockistSelectionScreen extends StatefulWidget {
   const StockistSelectionScreen({super.key});
+
+  @override
+  State<StockistSelectionScreen> createState() => _StockistSelectionScreenState();
+}
+
+class _StockistSelectionScreenState extends State<StockistSelectionScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final dcrProvider = Provider.of<DcrProvider>(context, listen: false);
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 50) {
+      dcrProvider.loadMoreStockists();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +143,7 @@ class StockistSelectionScreen extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
-              'Select one or more stockists associated with this chemist to view available brand products.',
+              'Select one or more stockists to view available products.',
               style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
           ),
@@ -129,14 +156,28 @@ class StockistSelectionScreen extends StatelessWidget {
                 : dcrProvider.availableStockists.isEmpty
                     ? const Center(
                         child: Text(
-                          'No stockists mapped to this chemist.',
+                          'No stockists available.',
                           style: TextStyle(color: AppColors.textMuted),
                         ),
                       )
                     : ListView.builder(
+                        controller: _scrollController,
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: dcrProvider.availableStockists.length,
+                        itemCount: dcrProvider.availableStockists.length +
+                            (dcrProvider.hasMoreStockists ? 1 : 0),
                         itemBuilder: (context, index) {
+                          if (index == dcrProvider.availableStockists.length) {
+                            return const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            );
+                          }
+
                           final stockist = dcrProvider.availableStockists[index];
                           final isSelected = dcrProvider.selectedStockistIds
                               .contains(stockist.id);

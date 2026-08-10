@@ -8,8 +8,35 @@ import '../widgets/custom_text_field.dart';
 import '../core/constants/app_colors.dart';
 import 'stockist_selection_screen.dart';
 
-class ChemistSelectionScreen extends StatelessWidget {
+class ChemistSelectionScreen extends StatefulWidget {
   const ChemistSelectionScreen({super.key});
+
+  @override
+  State<ChemistSelectionScreen> createState() => _ChemistSelectionScreenState();
+}
+
+class _ChemistSelectionScreenState extends State<ChemistSelectionScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final dcrProvider = Provider.of<DcrProvider>(context, listen: false);
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 50) {
+      dcrProvider.loadMoreChemists();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,8 +137,22 @@ class ChemistSelectionScreen extends StatelessWidget {
                           ),
                         )
                       : ListView.builder(
-                          itemCount: dcrProvider.chemists.length,
+                          controller: _scrollController,
+                          itemCount: dcrProvider.chemists.length +
+                              (dcrProvider.hasMoreChemists ? 1 : 0),
                           itemBuilder: (context, index) {
+                            if (index == dcrProvider.chemists.length) {
+                              return const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              );
+                            }
+
                             final chemist = dcrProvider.chemists[index];
                             final isSelected =
                                 dcrProvider.selectedChemist?.id == chemist.id;

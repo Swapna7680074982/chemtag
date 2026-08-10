@@ -8,6 +8,8 @@ class DcrItem {
   final String packSize;
   final int quantity;
   final double ptr;
+  final String stockistId;
+  final String stockistName;
 
   DcrItem({
     required this.productId,
@@ -16,6 +18,8 @@ class DcrItem {
     required this.packSize,
     required this.quantity,
     required this.ptr,
+    required this.stockistId,
+    required this.stockistName,
   });
 
   double get totalPrice => ptr * quantity;
@@ -28,6 +32,8 @@ class DcrItem {
       packSize: json['pack_size'] ?? '',
       quantity: json['quantity'] ?? 0,
       ptr: (json['ptr'] as num?)?.toDouble() ?? 0.0,
+      stockistId: json['stockist_id'] ?? '',
+      stockistName: json['stockist_name'] ?? '',
     );
   }
 
@@ -38,6 +44,8 @@ class DcrItem {
         'pack_size': packSize,
         'quantity': quantity,
         'ptr': ptr,
+        'stockist_id': stockistId,
+        'stockist_name': stockistName,
         'total_price': totalPrice,
       };
 }

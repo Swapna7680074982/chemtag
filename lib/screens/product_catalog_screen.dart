@@ -8,8 +8,35 @@ import '../core/constants/app_colors.dart';
 import '../core/utils/formatters.dart';
 import 'dcr_summary_dialog.dart';
 
-class ProductCatalogScreen extends StatelessWidget {
+class ProductCatalogScreen extends StatefulWidget {
   const ProductCatalogScreen({super.key});
+
+  @override
+  State<ProductCatalogScreen> createState() => _ProductCatalogScreenState();
+}
+
+class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final dcrProvider = Provider.of<DcrProvider>(context, listen: false);
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 50) {
+      dcrProvider.loadMoreProducts();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +49,7 @@ class ProductCatalogScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Step 3 of 4: Brands & Product Order',
+              'Step 3 of 4: Product Order',
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -43,10 +70,10 @@ class ProductCatalogScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // Search & Filter Header Section
+          // Search Header Section
           Container(
             color: Colors.white,
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -55,33 +82,6 @@ class ProductCatalogScreen extends StatelessWidget {
                   hintText: 'Search product name, SKU, or formulation...',
                   prefixIcon: Icons.search,
                   onChanged: (val) => dcrProvider.filterProducts(val),
-                ),
-                const SizedBox(height: 12),
-
-                // Brand Filter Pills Horizontal Scroll
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildBrandChip(
-                        context: context,
-                        label: 'All Brands',
-                        isSelected: dcrProvider.selectedBrandId == null ||
-                            dcrProvider.selectedBrandId == 'ALL',
-                        onTap: () => dcrProvider.setBrandFilter('ALL'),
-                      ),
-                      ...dcrProvider.brands.map((brand) {
-                        final isSelected =
-                            dcrProvider.selectedBrandId == brand.id;
-                        return _buildBrandChip(
-                          context: context,
-                          label: brand.name,
-                          isSelected: isSelected,
-                          onTap: () => dcrProvider.setBrandFilter(brand.id),
-                        );
-                      }),
-                    ],
-                  ),
                 ),
               ],
             ),
@@ -105,7 +105,7 @@ class ProductCatalogScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 12),
                             const Text(
-                              'No products match the selected stockists/brands',
+                              'No products match the selected stockists',
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -114,7 +114,7 @@ class ProductCatalogScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Try selecting all brands or modifying stockist selection',
+                              'Try modifying stockist selection or search query',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textMuted,
@@ -124,17 +124,36 @@ class ProductCatalogScreen extends StatelessWidget {
                         ),
                       )
                     : ListView.builder(
+                        controller: _scrollController,
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: dcrProvider.products.length,
+                        itemCount: dcrProvider.products.length +
+                            (dcrProvider.hasMoreProducts ? 1 : 0),
                         itemBuilder: (context, index) {
+                          if (index == dcrProvider.products.length) {
+                            return const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            );
+                          }
+
                           final product = dcrProvider.products[index];
-                          final qty = dcrProvider.getQuantity(product.id);
+                          final availableSelectedStockists = dcrProvider.selectedStockistsList
+                              .where((s) => product.availableStockistIds.contains(s.id))
+                              .toList();
 
                           return ProductItemCard(
                             product: product,
-                            quantity: qty,
-                            onQuantityChanged: (newQty) {
-                              dcrProvider.updateQuantity(product.id, newQty);
+                            availableSelectedStockists: availableSelectedStockists,
+                            getQuantity: (stockistId) =>
+                                dcrProvider.getQuantity(product.id, stockistId),
+                            onQuantityChanged: (stockistId, qty) {
+                              dcrProvider.updateQuantity(
+                                  product.id, stockistId, qty);
                             },
                           );
                         },
@@ -210,36 +229,6 @@ class ProductCatalogScreen extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildBrandChip({
-    required BuildContext context,
-    required String label,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: FilterChip(
-        label: Text(label),
-        selected: isSelected,
-        onSelected: (_) => onTap(),
-        selectedColor: AppColors.primary,
-        backgroundColor: AppColors.background,
-        checkmarkColor: Colors.white,
-        labelStyle: TextStyle(
-          fontSize: 12,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-          color: isSelected ? Colors.white : AppColors.textPrimary,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(
-            color: isSelected ? AppColors.primary : AppColors.border,
-          ),
-        ),
       ),
     );
   }

@@ -10,27 +10,42 @@ import '../core/utils/location_helper.dart';
 class DcrProvider with ChangeNotifier {
   final MockDcrService _apiService = MockDcrService();
 
+  // Page Sizes for Lazy Loading
+  static const int _pageSizeChemists = 2;
+  static const int _pageSizeStockists = 2;
+  static const int _pageSizeProducts = 3;
+  static const int _pageSizeHistory = 3;
+
   // Mapped Chemists
   List<Chemist> _mappedChemists = [];
   List<Chemist> _filteredChemists = [];
+  List<Chemist> _paginatedChemists = [];
   Chemist? _selectedChemist;
   String _chemistSearchQuery = '';
   bool _isLoadingChemists = false;
+  bool _hasMoreChemists = true;
+  bool _isLoadingMoreChemists = false;
 
   // Stockists Selection (Multi-select)
   List<Stockist> _availableStockists = [];
+  List<Stockist> _paginatedStockists = [];
   final Set<String> _selectedStockistIds = {};
   bool _isLoadingStockists = false;
+  bool _hasMoreStockists = true;
+  bool _isLoadingMoreStockists = false;
 
   // Brands & Products Catalog
   List<Brand> _brands = [];
   String? _selectedBrandId; // null or 'ALL' means all brands
   List<Product> _allProductsForStockists = [];
   List<Product> _filteredProducts = [];
+  List<Product> _paginatedProducts = [];
   String _productSearchQuery = '';
   bool _isLoadingProducts = false;
+  bool _hasMoreProducts = true;
+  bool _isLoadingMoreProducts = false;
 
-  // Product Quantity Entry Map: productId -> quantity
+  // Product Quantity Entry Map: "productId:stockistId" -> quantity
   final Map<String, int> _productQuantities = {};
 
   // Location & Submission State
@@ -40,26 +55,37 @@ class DcrProvider with ChangeNotifier {
 
   // DCR History
   List<DcrSubmission> _dcrHistory = [];
+  List<DcrSubmission> _paginatedHistory = [];
   bool _isLoadingHistory = false;
+  bool _hasMoreHistory = true;
+  bool _isLoadingMoreHistory = false;
 
   // Getters
-  List<Chemist> get chemists => _filteredChemists;
+  List<Chemist> get chemists => _paginatedChemists;
   Chemist? get selectedChemist => _selectedChemist;
   bool get isLoadingChemists => _isLoadingChemists;
   String get chemistSearchQuery => _chemistSearchQuery;
+  bool get hasMoreChemists => _hasMoreChemists;
+  bool get isLoadingMoreChemists => _isLoadingMoreChemists;
 
-  List<Stockist> get availableStockists => _availableStockists;
+  List<Stockist> get availableStockists => _paginatedStockists;
+  List<Stockist> get allAvailableStockistsRaw => _availableStockists;
   Set<String> get selectedStockistIds => _selectedStockistIds;
   List<Stockist> get selectedStockistsList => _availableStockists
       .where((s) => _selectedStockistIds.contains(s.id))
       .toList();
   bool get isLoadingStockists => _isLoadingStockists;
+  bool get hasMoreStockists => _hasMoreStockists;
+  bool get isLoadingMoreStockists => _isLoadingMoreStockists;
 
   List<Brand> get brands => _brands;
   String? get selectedBrandId => _selectedBrandId;
-  List<Product> get products => _filteredProducts;
+  List<Product> get products => _paginatedProducts;
+  List<Product> get allProductsForSelectedStockists => _allProductsForStockists;
   String get productSearchQuery => _productSearchQuery;
   bool get isLoadingProducts => _isLoadingProducts;
+  bool get hasMoreProducts => _hasMoreProducts;
+  bool get isLoadingMoreProducts => _isLoadingMoreProducts;
 
   Map<String, int> get productQuantities => _productQuantities;
 
@@ -67,8 +93,10 @@ class DcrProvider with ChangeNotifier {
   bool get isCapturingLocation => _isCapturingLocation;
   bool get isSubmitting => _isSubmitting;
 
-  List<DcrSubmission> get dcrHistory => _dcrHistory;
+  List<DcrSubmission> get dcrHistory => _paginatedHistory;
   bool get isLoadingHistory => _isLoadingHistory;
+  bool get hasMoreHistory => _hasMoreHistory;
+  bool get isLoadingMoreHistory => _isLoadingMoreHistory;
 
   // Calculations
   int get totalItemsCount =>
@@ -79,8 +107,10 @@ class DcrProvider with ChangeNotifier {
 
   double get totalEstimatedValue {
     double total = 0.0;
-    _productQuantities.forEach((productId, qty) {
+    _productQuantities.forEach((key, qty) {
       if (qty > 0) {
+        final parts = key.split(':');
+        final productId = parts[0];
         final product = _allProductsForStockists.firstWhere(
           (p) => p.id == productId,
           orElse: () => Product(
@@ -139,6 +169,28 @@ class DcrProvider with ChangeNotifier {
             c.licenseNo.toLowerCase().contains(q);
       }).toList();
     }
+    _initChemistsPagination();
+  }
+
+  void _initChemistsPagination() {
+    _paginatedChemists = _filteredChemists.take(_pageSizeChemists).toList();
+    _hasMoreChemists = _filteredChemists.length > _paginatedChemists.length;
+    _isLoadingMoreChemists = false;
+  }
+
+  Future<void> loadMoreChemists() async {
+    if (_isLoadingMoreChemists || !_hasMoreChemists) return;
+    _isLoadingMoreChemists = true;
+    notifyListeners();
+
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    final currentLength = _paginatedChemists.length;
+    final nextBatch = _filteredChemists.skip(currentLength).take(_pageSizeChemists);
+    _paginatedChemists.addAll(nextBatch);
+    _hasMoreChemists = _filteredChemists.length > _paginatedChemists.length;
+    _isLoadingMoreChemists = false;
+    notifyListeners();
   }
 
   Future<void> selectChemist(Chemist chemist) async {
@@ -149,14 +201,13 @@ class DcrProvider with ChangeNotifier {
     _productSearchQuery = '';
     notifyListeners();
 
-    // Fetch mapped stockists for this chemist
+    // Fetch all stockists for any chemist (not linked)
     _isLoadingStockists = true;
     notifyListeners();
 
-    _availableStockists =
-        await _apiService.getStockistsForChemist(chemist.mappedStockistIds);
+    _availableStockists = await _apiService.getAllStockists();
+    _initStockistsPagination();
 
-    // Do not auto-select first stockist by default per user requirement
     await loadProductsForSelectedStockists();
 
     _isLoadingStockists = false;
@@ -164,9 +215,32 @@ class DcrProvider with ChangeNotifier {
   }
 
   // --- Step 2: Multi-Stockist Selection ---
+  void _initStockistsPagination() {
+    _paginatedStockists = _availableStockists.take(_pageSizeStockists).toList();
+    _hasMoreStockists = _availableStockists.length > _paginatedStockists.length;
+    _isLoadingMoreStockists = false;
+  }
+
+  Future<void> loadMoreStockists() async {
+    if (_isLoadingMoreStockists || !_hasMoreStockists) return;
+    _isLoadingMoreStockists = true;
+    notifyListeners();
+
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    final currentLength = _paginatedStockists.length;
+    final nextBatch = _availableStockists.skip(currentLength).take(_pageSizeStockists);
+    _paginatedStockists.addAll(nextBatch);
+    _hasMoreStockists = _availableStockists.length > _paginatedStockists.length;
+    _isLoadingMoreStockists = false;
+    notifyListeners();
+  }
+
   void toggleStockist(String stockistId) {
     if (_selectedStockistIds.contains(stockistId)) {
       _selectedStockistIds.remove(stockistId);
+      // Remove any product quantities linked to this deselected stockist
+      _productQuantities.removeWhere((key, value) => key.endsWith(':$stockistId'));
     } else {
       _selectedStockistIds.add(stockistId);
     }
@@ -213,34 +287,60 @@ class DcrProvider with ChangeNotifier {
           p.brandName.toLowerCase().contains(_productSearchQuery.toLowerCase());
       return matchesBrand && matchesSearch;
     }).toList();
+    _initProductsPagination();
   }
 
-  void updateQuantity(String productId, int quantity) {
+  void _initProductsPagination() {
+    _paginatedProducts = _filteredProducts.take(_pageSizeProducts).toList();
+    _hasMoreProducts = _filteredProducts.length > _paginatedProducts.length;
+    _isLoadingMoreProducts = false;
+  }
+
+  Future<void> loadMoreProducts() async {
+    if (_isLoadingMoreProducts || !_hasMoreProducts) return;
+    _isLoadingMoreProducts = true;
+    notifyListeners();
+
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    final currentLength = _paginatedProducts.length;
+    final nextBatch = _filteredProducts.skip(currentLength).take(_pageSizeProducts);
+    _paginatedProducts.addAll(nextBatch);
+    _hasMoreProducts = _filteredProducts.length > _paginatedProducts.length;
+    _isLoadingMoreProducts = false;
+    notifyListeners();
+  }
+
+  void updateQuantity(String productId, String stockistId, int quantity) {
+    final key = '$productId:$stockistId';
     if (quantity <= 0) {
-      _productQuantities.remove(productId);
+      _productQuantities.remove(key);
     } else {
-      _productQuantities[productId] = quantity;
+      _productQuantities[key] = quantity;
     }
     notifyListeners();
   }
 
-  void incrementQuantity(String productId) {
-    int current = _productQuantities[productId] ?? 0;
-    _productQuantities[productId] = current + 1;
+  void incrementQuantity(String productId, String stockistId) {
+    final key = '$productId:$stockistId';
+    int current = _productQuantities[key] ?? 0;
+    _productQuantities[key] = current + 1;
     notifyListeners();
   }
 
-  void decrementQuantity(String productId) {
-    int current = _productQuantities[productId] ?? 0;
+  void decrementQuantity(String productId, String stockistId) {
+    final key = '$productId:$stockistId';
+    int current = _productQuantities[key] ?? 0;
     if (current > 1) {
-      _productQuantities[productId] = current - 1;
+      _productQuantities[key] = current - 1;
     } else {
-      _productQuantities.remove(productId);
+      _productQuantities.remove(key);
     }
     notifyListeners();
   }
 
-  int getQuantity(String productId) => _productQuantities[productId] ?? 0;
+  int getQuantity(String productId, String stockistId) =>
+      _productQuantities['$productId:$stockistId'] ?? 0;
 
   // --- Step 4: Geo-Location Capture & DCR Submission ---
   Future<LocationDataResult> captureLocation() async {
@@ -277,9 +377,13 @@ class DcrProvider with ChangeNotifier {
     }
 
     final items = <DcrItem>[];
-    _productQuantities.forEach((productId, qty) {
+    _productQuantities.forEach((key, qty) {
       if (qty > 0) {
+        final parts = key.split(':');
+        final productId = parts[0];
+        final stockistId = parts[1];
         final product = _allProductsForStockists.firstWhere((p) => p.id == productId);
+        final stockist = _availableStockists.firstWhere((s) => s.id == stockistId);
         items.add(DcrItem(
           productId: product.id,
           productName: product.name,
@@ -287,6 +391,8 @@ class DcrProvider with ChangeNotifier {
           packSize: product.packSize,
           quantity: qty,
           ptr: product.ptr,
+          stockistId: stockist.id,
+          stockistName: stockist.name,
         ));
       }
     });
@@ -309,6 +415,7 @@ class DcrProvider with ChangeNotifier {
 
     if (success) {
       _dcrHistory.insert(0, submission);
+      _initHistoryPagination();
       clearQuantities();
     }
 
@@ -328,8 +435,30 @@ class DcrProvider with ChangeNotifier {
     notifyListeners();
 
     _dcrHistory = await _apiService.getDcrHistory();
+    _initHistoryPagination();
 
     _isLoadingHistory = false;
+    notifyListeners();
+  }
+
+  void _initHistoryPagination() {
+    _paginatedHistory = _dcrHistory.take(_pageSizeHistory).toList();
+    _hasMoreHistory = _dcrHistory.length > _paginatedHistory.length;
+    _isLoadingMoreHistory = false;
+  }
+
+  Future<void> loadMoreHistory() async {
+    if (_isLoadingMoreHistory || !_hasMoreHistory) return;
+    _isLoadingMoreHistory = true;
+    notifyListeners();
+
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    final currentLength = _paginatedHistory.length;
+    final nextBatch = _dcrHistory.skip(currentLength).take(_pageSizeHistory);
+    _paginatedHistory.addAll(nextBatch);
+    _hasMoreHistory = _dcrHistory.length > _paginatedHistory.length;
+    _isLoadingMoreHistory = false;
     notifyListeners();
   }
 
@@ -337,8 +466,10 @@ class DcrProvider with ChangeNotifier {
     _selectedChemist = null;
     _selectedStockistIds.clear();
     _availableStockists.clear();
+    _paginatedStockists.clear();
     _allProductsForStockists.clear();
     _filteredProducts.clear();
+    _paginatedProducts.clear();
     _productQuantities.clear();
     _selectedBrandId = null;
     _productSearchQuery = '';

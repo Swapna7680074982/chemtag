@@ -6,8 +6,35 @@ import '../models/dcr_submission.dart';
 import '../core/constants/app_colors.dart';
 import '../core/utils/formatters.dart';
 
-class DcrHistoryScreen extends StatelessWidget {
+class DcrHistoryScreen extends StatefulWidget {
   const DcrHistoryScreen({super.key});
+
+  @override
+  State<DcrHistoryScreen> createState() => _DcrHistoryScreenState();
+}
+
+class _DcrHistoryScreenState extends State<DcrHistoryScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final dcrProvider = Provider.of<DcrProvider>(context, listen: false);
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 50) {
+      dcrProvider.loadMoreHistory();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,9 +86,23 @@ class DcrHistoryScreen extends StatelessWidget {
                   ),
                 )
               : ListView.builder(
+                  controller: _scrollController,
                   padding: const EdgeInsets.all(16),
-                  itemCount: dcrProvider.dcrHistory.length,
+                  itemCount: dcrProvider.dcrHistory.length +
+                      (dcrProvider.hasMoreHistory ? 1 : 0),
                   itemBuilder: (context, index) {
+                    if (index == dcrProvider.dcrHistory.length) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      );
+                    }
+
                     final submission = dcrProvider.dcrHistory[index];
                     return _buildSubmissionCard(context, submission);
                   },
@@ -153,7 +194,7 @@ class DcrHistoryScreen extends StatelessWidget {
           ],
         ),
         children: [
-          const Divider(height: 1),
+          const Divider(height: 16),
           Padding(
             padding: const EdgeInsets.all(14.0),
             child: Column(
@@ -194,7 +235,7 @@ class DcrHistoryScreen extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            '• ${item.productName} (${item.brandName}, ${item.packSize})',
+                            '• ${item.productName} (${item.packSize}) [Distributor: ${item.stockistName}]',
                             style: const TextStyle(
                               fontSize: 12,
                               color: AppColors.textPrimary,

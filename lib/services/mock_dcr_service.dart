@@ -282,6 +282,11 @@ class MockDcrService {
         .toList();
   }
 
+  Future<List<Stockist>> getAllStockists() async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    return _allStockists;
+  }
+
   Future<List<Brand>> getBrands() async {
     await Future.delayed(const Duration(milliseconds: 200));
     return _allBrands;
