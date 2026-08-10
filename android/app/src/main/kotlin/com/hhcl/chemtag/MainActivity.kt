@@ -1,4 +1,4 @@
-package com.hhcl.dcrchemist
+package com.hhcl.chemtag
 
 import io.flutter.embedding.android.FlutterActivity
 

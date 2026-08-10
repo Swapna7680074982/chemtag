@@ -92,9 +92,9 @@ BEGIN
             VALUE "CompanyName", "com.hhcl" "\0"
             VALUE "FileDescription", "ChemTag" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "dcr_chemist" "\0"
+            VALUE "InternalName", "chemtag" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.hhcl. All rights reserved." "\0"
-            VALUE "OriginalFilename", "dcr_chemist.exe" "\0"
+            VALUE "OriginalFilename", "chemtag.exe" "\0"
             VALUE "ProductName", "ChemTag" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END

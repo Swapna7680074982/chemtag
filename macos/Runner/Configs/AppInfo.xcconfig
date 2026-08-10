@@ -8,7 +8,7 @@
 PRODUCT_NAME = ChemTag
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.hhcl.dcrchemist
+PRODUCT_BUNDLE_IDENTIFIER = com.hhcl.chemtag
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2026 com.hhcl. All rights reserved.
