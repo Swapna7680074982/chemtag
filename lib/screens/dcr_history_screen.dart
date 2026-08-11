@@ -20,6 +20,10 @@ class _DcrHistoryScreenState extends State<DcrHistoryScreen> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final dcrProvider = Provider.of<DcrProvider>(context, listen: false);
+      dcrProvider.fetchDcrHistory();
+    });
   }
 
   @override

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/auth_provider.dart';
+import '../providers/dcr_provider.dart';
 import '../widgets/custom_text_field.dart';
 import '../core/constants/app_colors.dart';
 import 'dashboard_screen.dart';
@@ -35,6 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (success && mounted) {
+        Provider.of<DcrProvider>(context, listen: false).clearAllData();
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const DashboardScreen()),
         );

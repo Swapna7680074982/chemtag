@@ -17,16 +17,25 @@ class ProductCatalogScreen extends StatefulWidget {
 
 class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
   final ScrollController _scrollController = ScrollController();
+  late final TextEditingController _searchController;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    
+    final dcrProvider = Provider.of<DcrProvider>(context, listen: false);
+    _searchController = TextEditingController(text: dcrProvider.productSearchQuery);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      dcrProvider.loadProductsForSelectedStockists();
+    });
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -78,10 +87,24 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CustomTextField(
+                  controller: _searchController,
                   labelText: 'Search Product Catalog',
                   hintText: 'Search product name, SKU, or formulation...',
                   prefixIcon: Icons.search,
-                  onChanged: (val) => dcrProvider.filterProducts(val),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear, color: AppColors.textMuted),
+                          onPressed: () {
+                            _searchController.clear();
+                            dcrProvider.filterProducts('');
+                            setState(() {});
+                          },
+                        )
+                      : null,
+                  onChanged: (val) {
+                    dcrProvider.filterProducts(val);
+                    setState(() {});
+                  },
                 ),
               ],
             ),

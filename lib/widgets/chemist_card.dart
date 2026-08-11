@@ -5,13 +5,13 @@ import '../core/constants/app_colors.dart';
 class ChemistCard extends StatelessWidget {
   final Chemist chemist;
   final bool isSelected;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   const ChemistCard({
     super.key,
     required this.chemist,
     this.isSelected = false,
-    required this.onTap,
+    this.onTap,
   });
 
   @override
@@ -122,23 +122,6 @@ class ChemistCard extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 11,
                             color: AppColors.textSecondary,
-                          ),
-                        ),
-                        const Spacer(),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryLight,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Text(
-                            'All Stockists',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.primaryDark,
-                            ),
                           ),
                         ),
                       ],

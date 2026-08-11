@@ -9,7 +9,8 @@ import '../core/constants/app_colors.dart';
 import 'stockist_selection_screen.dart';
 
 class ChemistSelectionScreen extends StatefulWidget {
-  const ChemistSelectionScreen({super.key});
+  final bool isCatalog;
+  const ChemistSelectionScreen({super.key, this.isCatalog = false});
 
   @override
   State<ChemistSelectionScreen> createState() => _ChemistSelectionScreenState();
@@ -17,16 +18,27 @@ class ChemistSelectionScreen extends StatefulWidget {
 
 class _ChemistSelectionScreenState extends State<ChemistSelectionScreen> {
   final ScrollController _scrollController = ScrollController();
+  late final TextEditingController _searchController;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    
+    final dcrProvider = Provider.of<DcrProvider>(context, listen: false);
+    _searchController = TextEditingController(text: dcrProvider.chemistSearchQuery);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final tseId = authProvider.currentUser?.employeeId ?? 'TSE-10042';
+      dcrProvider.loadMappedChemists(tseId);
+    });
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -51,7 +63,7 @@ class _ChemistSelectionScreenState extends State<ChemistSelectionScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Step 1 of 4: Select Chemist',
+              widget.isCatalog ? 'Mapped Chemists Catalog' : 'Step 1 of 4: Select Chemist',
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -76,10 +88,24 @@ class _ChemistSelectionScreenState extends State<ChemistSelectionScreen> {
           children: [
             // Search Input Field
             CustomTextField(
+              controller: _searchController,
               labelText: 'Search Mapped Chemists',
               hintText: 'Search by store name, owner, locality, or DL No...',
               prefixIcon: Icons.search,
-              onChanged: (val) => dcrProvider.filterChemists(val),
+              suffixIcon: _searchController.text.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear, color: AppColors.textMuted),
+                      onPressed: () {
+                        _searchController.clear();
+                        dcrProvider.filterChemists('');
+                        setState(() {});
+                      },
+                    )
+                  : null,
+              onChanged: (val) {
+                dcrProvider.filterChemists(val);
+                setState(() {});
+              },
             ),
             const SizedBox(height: 16),
 
@@ -87,7 +113,7 @@ class _ChemistSelectionScreenState extends State<ChemistSelectionScreen> {
             Row(
               children: [
                 Text(
-                  'Showing ${dcrProvider.chemists.length} Mapped Chemists',
+                  'Showing Mapped Chemists',
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -202,23 +228,26 @@ class _ChemistSelectionScreenState extends State<ChemistSelectionScreen> {
                             }
 
                             final chemist = dcrProvider.chemists[index];
-                            final isSelected =
-                                dcrProvider.selectedChemist?.id == chemist.id;
+                            final isSelected = widget.isCatalog
+                                ? false
+                                : dcrProvider.selectedChemist?.id == chemist.id;
 
                             return ChemistCard(
                               chemist: chemist,
                               isSelected: isSelected,
-                              onTap: () async {
-                                await dcrProvider.selectChemist(chemist);
-                                if (context.mounted) {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) =>
-                                          const StockistSelectionScreen(),
-                                    ),
-                                  );
-                                }
-                              },
+                              onTap: widget.isCatalog
+                                  ? null
+                                  : () async {
+                                      await dcrProvider.selectChemist(chemist);
+                                      if (context.mounted) {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (_) =>
+                                                const StockistSelectionScreen(),
+                                          ),
+                                        );
+                                      }
+                                    },
                             );
                           },
                         ),

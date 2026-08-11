@@ -267,6 +267,25 @@ class DcrProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> refreshStockists() async {
+    _isLoadingStockists = true;
+    _stockistsError = null;
+    notifyListeners();
+
+    try {
+      _availableStockists =
+          await _apiService.getStockistsForUser(_tseEmployeeId ?? 'TSE-10042');
+      _initStockistsPagination();
+    } catch (e) {
+      _stockistsError = e.toString();
+      _availableStockists = [];
+      _paginatedStockists = [];
+    } finally {
+      _isLoadingStockists = false;
+      notifyListeners();
+    }
+  }
+
   void toggleStockist(String stockistId) {
     if (_selectedStockistIds.contains(stockistId)) {
       _selectedStockistIds.remove(stockistId);
@@ -521,11 +540,57 @@ class DcrProvider with ChangeNotifier {
     _productQuantities.clear();
     _selectedBrandId = null;
     _productSearchQuery = '';
+    _chemistSearchQuery = '';
     _currentLocation = null;
     _chemistsError = null;
     _stockistsError = null;
     _productsError = null;
     _historyError = null;
+    notifyListeners();
+  }
+
+  void clearAllData() {
+    _mappedChemists = [];
+    _filteredChemists = [];
+    _paginatedChemists = [];
+    _selectedChemist = null;
+    _chemistSearchQuery = '';
+    _isLoadingChemists = false;
+    _hasMoreChemists = true;
+    _isLoadingMoreChemists = false;
+
+    _availableStockists = [];
+    _paginatedStockists = [];
+    _selectedStockistIds.clear();
+    _isLoadingStockists = false;
+    _hasMoreStockists = true;
+    _isLoadingMoreStockists = false;
+
+    _chemistsError = null;
+    _stockistsError = null;
+    _productsError = null;
+    _historyError = null;
+
+    _allProductsForStockists = [];
+    _filteredProducts = [];
+    _paginatedProducts = [];
+    _productSearchQuery = '';
+    _isLoadingProducts = false;
+    _hasMoreProducts = true;
+    _isLoadingMoreProducts = false;
+
+    _productQuantities.clear();
+
+    _currentLocation = null;
+    _isCapturingLocation = false;
+    _isSubmitting = false;
+
+    _dcrHistory = [];
+    _paginatedHistory = [];
+    _isLoadingHistory = false;
+    _hasMoreHistory = true;
+    _isLoadingMoreHistory = false;
+
     notifyListeners();
   }
 }

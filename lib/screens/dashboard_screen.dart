@@ -242,7 +242,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               onTap: () {
                 dcrProvider.resetWorkflow();
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const ChemistSelectionScreen()),
+                  MaterialPageRoute(builder: (_) => const ChemistSelectionScreen(isCatalog: true)),
                 );
               },
             ),
@@ -434,6 +434,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             onPressed: () {
               Navigator.of(ctx).pop(); // Close dialog
               authProvider.logout();
+              Provider.of<DcrProvider>(context, listen: false).clearAllData();
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (_) => const LoginScreen()),
               );
