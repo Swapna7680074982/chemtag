@@ -5,7 +5,6 @@ import '../providers/dcr_provider.dart';
 import '../widgets/product_item_card.dart';
 import '../widgets/custom_text_field.dart';
 import '../core/constants/app_colors.dart';
-import '../core/utils/formatters.dart';
 import 'dcr_summary_dialog.dart';
 
 class ProductCatalogScreen extends StatefulWidget {
@@ -249,25 +248,24 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                 children: [
                   Row(
                     children: [
-                      Column(
+                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            '${dcrProvider.totalItemsCount} Products • ${dcrProvider.totalUnitsQuantity} Units',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
-                              fontWeight: FontWeight.w500,
+                          const Text(
+                            'Selected Order Summary',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: AppColors.textMuted,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            AppFormatters.formatCurrency(
-                                dcrProvider.totalEstimatedValue),
+                            '${dcrProvider.totalItemsCount} Products • ${dcrProvider.totalUnitsQuantity} Units',
                             style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.primaryDark,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
                             ),
                           ),
                         ],

@@ -253,15 +253,6 @@ class _DcrHistoryScreenState extends State<DcrHistoryScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Text(
-                          AppFormatters.formatCurrency(item.totalPrice),
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryDark,
-                          ),
-                        ),
                       ],
                     ),
                   );
@@ -276,15 +267,6 @@ class _DcrHistoryScreenState extends State<DcrHistoryScreen> {
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      'Total Order Value: ${AppFormatters.formatCurrency(submission.totalValue)}',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.primaryDark,
                       ),
                     ),
                   ],

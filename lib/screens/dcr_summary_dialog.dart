@@ -6,7 +6,6 @@ import '../providers/dcr_provider.dart';
 import '../models/stockist.dart';
 import '../models/product.dart';
 import '../core/constants/app_colors.dart';
-import '../core/utils/formatters.dart';
 
 class DcrSummaryDialog extends StatefulWidget {
   const DcrSummaryDialog({super.key});
@@ -244,28 +243,6 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
                         final stockist = group.key;
                         final entries = group.value;
 
-                        // Calculate stockist subtotal
-                        double stockistSubtotal = 0.0;
-                        for (final entry in entries) {
-                          final parts = entry.key.split(':');
-                          final productId = parts[0];
-                          final product = dcrProvider.allProductsForSelectedStockists.firstWhere(
-                            (p) => p.id == productId,
-                            orElse: () => Product(
-                              id: productId,
-                              name: 'Unknown Product',
-                              skuCode: '',
-                              brandId: '',
-                              brandName: '',
-                              packSize: '',
-                              ptr: 0.0,
-                              mrp: 0.0,
-                              tseEmployeeId: '',
-                            ),
-                          );
-                          stockistSubtotal += product.ptr * entry.value;
-                        }
-
                         return Container(
                           margin: const EdgeInsets.only(bottom: 14),
                           padding: const EdgeInsets.all(12),
@@ -316,12 +293,9 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
                                     brandId: '',
                                     brandName: '',
                                     packSize: '',
-                                    ptr: 0.0,
-                                    mrp: 0.0,
                                     tseEmployeeId: '',
                                   ),
                                 );
-                                double itemTotal = product.ptr * entry.value;
 
                                 return Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 6),
@@ -341,7 +315,7 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
                                             ),
                                             const SizedBox(height: 2),
                                             Text(
-                                              'Pack: ${product.packSize} • PTR: ${AppFormatters.formatCurrency(product.ptr)}',
+                                              'Pack: ${product.packSize}',
                                               style: const TextStyle(
                                                 fontSize: 11,
                                                 color: AppColors.textMuted,
@@ -351,64 +325,27 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
                                         ),
                                       ),
                                       const SizedBox(width: 8),
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 8, vertical: 3),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.background,
-                                              borderRadius: BorderRadius.circular(6),
-                                              border: Border.all(color: AppColors.border),
-                                            ),
-                                            child: Text(
-                                              'Qty: ${entry.value}',
-                                              style: const TextStyle(
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.textPrimary,
-                                              ),
-                                            ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 3),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.background,
+                                          borderRadius: BorderRadius.circular(6),
+                                          border: Border.all(color: AppColors.border),
+                                        ),
+                                        child: Text(
+                                          'Qty: ${entry.value}',
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.textPrimary,
                                           ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            AppFormatters.formatCurrency(itemTotal),
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.success,
-                                            ),
-                                          ),
-                                        ],
+                                        ),
                                       ),
                                     ],
                                   ),
                                 );
                               }),
-                              const Divider(height: 16),
-                              // Subtotal Row
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  const Text(
-                                    'Distributor Subtotal: ',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.textSecondary,
-                                    ),
-                                  ),
-                                  Text(
-                                    AppFormatters.formatCurrency(stockistSubtotal),
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.primaryDark,
-                                    ),
-                                  ),
-                                ],
-                              ),
                             ],
                           ),
                         );
@@ -426,35 +363,34 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
                         ),
                         child: Row(
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Total Order Value',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  '${dcrProvider.totalItemsCount} Products (${dcrProvider.totalUnitsQuantity} Units)',
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    color: AppColors.textMuted,
-                                  ),
-                                ),
-                              ],
+                            const Icon(
+                              Icons.shopping_bag_outlined,
+                              color: AppColors.primary,
+                              size: 20,
                             ),
-                            const Spacer(),
-                            Text(
-                              AppFormatters.formatCurrency(
-                                  dcrProvider.totalEstimatedValue),
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.primary,
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Order Quantity Summary',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '${dcrProvider.totalItemsCount} Products (${dcrProvider.totalUnitsQuantity} Units)',
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],

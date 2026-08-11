@@ -7,7 +7,6 @@ class DcrItem {
   final String brandName;
   final String packSize;
   final int quantity;
-  final double ptr;
   final String stockistId;
   final String stockistName;
 
@@ -17,12 +16,9 @@ class DcrItem {
     required this.brandName,
     required this.packSize,
     required this.quantity,
-    required this.ptr,
     required this.stockistId,
     required this.stockistName,
   });
-
-  double get totalPrice => ptr * quantity;
 
   factory DcrItem.fromJson(Map<String, dynamic> json) {
     return DcrItem(
@@ -31,7 +27,6 @@ class DcrItem {
       brandName: json['brand_name'] ?? '',
       packSize: json['pack_size'] ?? '',
       quantity: json['quantity'] ?? 0,
-      ptr: (json['ptr'] as num?)?.toDouble() ?? 0.0,
       stockistId: json['stockist_id'] ?? '',
       stockistName: json['stockist_name'] ?? '',
     );
@@ -43,10 +38,8 @@ class DcrItem {
         'brand_name': brandName,
         'pack_size': packSize,
         'quantity': quantity,
-        'ptr': ptr,
         'stockist_id': stockistId,
         'stockist_name': stockistName,
-        'total_price': totalPrice,
       };
 }
 
@@ -78,7 +71,6 @@ class DcrSubmission {
   });
 
   int get totalQuantity => items.fold(0, (sum, item) => sum + item.quantity);
-  double get totalValue => items.fold(0.0, (sum, item) => sum + item.totalPrice);
 
   factory DcrSubmission.fromJson(Map<String, dynamic> json) {
     return DcrSubmission(
@@ -111,6 +103,5 @@ class DcrSubmission {
         'submitted_at': submittedAt.toIso8601String(),
         'notes': notes,
         'total_quantity': totalQuantity,
-        'total_value': totalValue,
       };
 }

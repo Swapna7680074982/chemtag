@@ -118,32 +118,6 @@ class DcrProvider with ChangeNotifier {
   int get totalUnitsQuantity =>
       _productQuantities.values.fold(0, (sum, qty) => sum + qty);
 
-  double get totalEstimatedValue {
-    double total = 0.0;
-    _productQuantities.forEach((key, qty) {
-      if (qty > 0) {
-        final parts = key.split(':');
-        final productId = parts[0];
-        final product = _allProductsForStockists.firstWhere(
-          (p) => p.id == productId,
-          orElse: () => Product(
-            id: '',
-            name: '',
-            skuCode: '',
-            brandId: '',
-            brandName: '',
-            packSize: '',
-            ptr: 0.0,
-            mrp: 0.0,
-            tseEmployeeId: '',
-          ),
-        );
-        total += product.ptr * qty;
-      }
-    });
-    return total;
-  }
-
   DcrProvider() {
     _initBrands();
   }
@@ -448,7 +422,6 @@ class DcrProvider with ChangeNotifier {
           brandName: product.brandName,
           packSize: product.packSize,
           quantity: qty,
-          ptr: product.ptr,
           stockistId: stockist.id,
           stockistName: stockist.name,
         ));

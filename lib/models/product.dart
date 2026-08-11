@@ -5,8 +5,6 @@ class Product {
   final String brandId;
   final String brandName;
   final String packSize;
-  final double ptr;
-  final double mrp;
   final bool inStock;
   final String tseEmployeeId;
 
@@ -17,8 +15,6 @@ class Product {
     required this.brandId,
     required this.brandName,
     required this.packSize,
-    required this.ptr,
-    required this.mrp,
     this.inStock = true,
     required this.tseEmployeeId,
   });
@@ -31,8 +27,6 @@ class Product {
       brandId: json['brand_id'] ?? '',
       brandName: json['brand_name'] ?? '',
       packSize: json['pack_size'] ?? '',
-      ptr: (json['ptr'] as num?)?.toDouble() ?? 0.0,
-      mrp: (json['mrp'] as num?)?.toDouble() ?? 0.0,
       inStock: json['in_stock'] ?? true,
       tseEmployeeId: json['tse_employee_id'] ?? '',
     );
@@ -45,8 +39,6 @@ class Product {
         'brand_id': brandId,
         'brand_name': brandName,
         'pack_size': packSize,
-        'ptr': ptr,
-        'mrp': mrp,
         'in_stock': inStock,
         'tse_employee_id': tseEmployeeId,
       };

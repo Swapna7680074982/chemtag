@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/product.dart';
 import '../core/constants/app_colors.dart';
-import '../core/utils/formatters.dart';
 import '../models/stockist.dart';
 
 class ProductItemCard extends StatelessWidget {
@@ -92,52 +91,7 @@ class ProductItemCard extends StatelessWidget {
                 color: AppColors.textSecondary,
               ),
             ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'PTR (Retailer Price)',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: AppColors.textMuted,
-                      ),
-                    ),
-                    Text(
-                      AppFormatters.formatCurrency(product.ptr),
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primaryDark,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'MRP',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: AppColors.textMuted,
-                      ),
-                    ),
-                    Text(
-                      AppFormatters.formatCurrency(product.mrp),
-                      style: const TextStyle(
-                        fontSize: 13,
-                        decoration: TextDecoration.lineThrough,
-                        color: AppColors.textMuted,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+
             const Divider(height: 24),
             const Text(
               'Select Quantities by Distributor:',
