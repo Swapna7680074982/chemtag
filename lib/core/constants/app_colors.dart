@@ -47,7 +47,7 @@ class AppColors {
   );
 
   static const LinearGradient tseCardGradient = LinearGradient(
-    colors: [Color(0xFF2563EB), Color(0xFF3B82F6)],
+    colors: [Color(0xFF1E3A8A), Color(0xFF2563EB)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
