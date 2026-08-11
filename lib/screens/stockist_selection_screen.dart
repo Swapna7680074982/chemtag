@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/dcr_provider.dart';
 import '../widgets/stockist_chip.dart';
+import '../widgets/custom_text_field.dart';
 import '../core/constants/app_colors.dart';
 import 'product_catalog_screen.dart';
 
@@ -15,13 +16,17 @@ class StockistSelectionScreen extends StatefulWidget {
 
 class _StockistSelectionScreenState extends State<StockistSelectionScreen> {
   final ScrollController _scrollController = ScrollController();
+  late final TextEditingController _searchController;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    
+    final dcrProvider = Provider.of<DcrProvider>(context, listen: false);
+    _searchController = TextEditingController(text: dcrProvider.stockistSearchQuery);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final dcrProvider = Provider.of<DcrProvider>(context, listen: false);
       dcrProvider.refreshStockists();
     });
   }
@@ -29,6 +34,7 @@ class _StockistSelectionScreenState extends State<StockistSelectionScreen> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -106,6 +112,30 @@ class _StockistSelectionScreenState extends State<StockistSelectionScreen> {
                   ),
                 ),
               ],
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            child: CustomTextField(
+              controller: _searchController,
+              labelText: 'Search Stockists / Distributors',
+              hintText: 'Search by name, code, contact, or city...',
+              prefixIcon: Icons.search,
+              suffixIcon: _searchController.text.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear, color: AppColors.textMuted),
+                      onPressed: () {
+                        _searchController.clear();
+                        dcrProvider.filterStockists('');
+                        setState(() {});
+                      },
+                    )
+                  : null,
+              onChanged: (val) {
+                dcrProvider.filterStockists(val);
+                setState(() {});
+              },
             ),
           ),
 
@@ -209,10 +239,37 @@ class _StockistSelectionScreenState extends State<StockistSelectionScreen> {
                         ),
                       )
                     : dcrProvider.availableStockists.isEmpty
-                    ? const Center(
-                        child: Text(
-                          'No stockists available.',
-                          style: TextStyle(color: AppColors.textMuted),
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.local_shipping_outlined,
+                              size: 56,
+                              color: AppColors.textMuted,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              dcrProvider.stockistSearchQuery.isNotEmpty
+                                  ? 'No stockists match your search query'
+                                  : 'No stockists available.',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                            if (dcrProvider.stockistSearchQuery.isNotEmpty) ...[
+                              const SizedBox(height: 4),
+                              const Text(
+                                'Try searching by a different name, code or city',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.textMuted,
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       )
                     : ListView.builder(

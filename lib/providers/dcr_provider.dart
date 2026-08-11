@@ -29,8 +29,10 @@ class DcrProvider with ChangeNotifier {
 
   // Stockists Selection (Multi-select)
   List<Stockist> _availableStockists = [];
+  List<Stockist> _filteredStockists = [];
   List<Stockist> _paginatedStockists = [];
   final Set<String> _selectedStockistIds = {};
+  String _stockistSearchQuery = '';
   bool _isLoadingStockists = false;
   bool _hasMoreStockists = true;
   bool _isLoadingMoreStockists = false;
@@ -81,6 +83,7 @@ class DcrProvider with ChangeNotifier {
   List<Stockist> get selectedStockistsList => _availableStockists
       .where((s) => _selectedStockistIds.contains(s.id))
       .toList();
+  String get stockistSearchQuery => _stockistSearchQuery;
   bool get isLoadingStockists => _isLoadingStockists;
   bool get hasMoreStockists => _hasMoreStockists;
   bool get isLoadingMoreStockists => _isLoadingMoreStockists;
@@ -196,6 +199,7 @@ class DcrProvider with ChangeNotifier {
     _productQuantities.clear();
     _selectedBrandId = null;
     _productSearchQuery = '';
+    _stockistSearchQuery = '';
     _stockistsError = null;
     _productsError = null;
     notifyListeners();
@@ -207,11 +211,12 @@ class DcrProvider with ChangeNotifier {
     try {
       _availableStockists =
           await _apiService.getStockistsForUser(_tseEmployeeId ?? 'TSE-10042');
-      _initStockistsPagination();
+      _applyStockistFilter();
       await loadProductsForSelectedStockists();
     } catch (e) {
       _stockistsError = e.toString();
       _availableStockists = [];
+      _filteredStockists = [];
       _paginatedStockists = [];
     } finally {
       _isLoadingStockists = false;
@@ -220,9 +225,31 @@ class DcrProvider with ChangeNotifier {
   }
 
   // --- Step 2: Multi-Stockist Selection ---
+  void filterStockists(String query) {
+    _stockistSearchQuery = query;
+    _applyStockistFilter();
+    notifyListeners();
+  }
+
+  void _applyStockistFilter() {
+    if (_stockistSearchQuery.trim().isEmpty) {
+      _filteredStockists = List.from(_availableStockists);
+    } else {
+      final q = _stockistSearchQuery.toLowerCase();
+      _filteredStockists = _availableStockists.where((s) {
+        return s.name.toLowerCase().contains(q) ||
+            s.code.toLowerCase().contains(q) ||
+            s.contactPerson.toLowerCase().contains(q) ||
+            s.city.toLowerCase().contains(q) ||
+            s.phone.toLowerCase().contains(q);
+      }).toList();
+    }
+    _initStockistsPagination();
+  }
+
   void _initStockistsPagination() {
-    _paginatedStockists = _availableStockists.take(_pageSizeStockists).toList();
-    _hasMoreStockists = _availableStockists.length > _paginatedStockists.length;
+    _paginatedStockists = _filteredStockists.take(_pageSizeStockists).toList();
+    _hasMoreStockists = _filteredStockists.length > _paginatedStockists.length;
     _isLoadingMoreStockists = false;
   }
 
@@ -234,9 +261,9 @@ class DcrProvider with ChangeNotifier {
     await Future.delayed(const Duration(milliseconds: 500));
 
     final currentLength = _paginatedStockists.length;
-    final nextBatch = _availableStockists.skip(currentLength).take(_pageSizeStockists);
+    final nextBatch = _filteredStockists.skip(currentLength).take(_pageSizeStockists);
     _paginatedStockists.addAll(nextBatch);
-    _hasMoreStockists = _availableStockists.length > _paginatedStockists.length;
+    _hasMoreStockists = _filteredStockists.length > _paginatedStockists.length;
     _isLoadingMoreStockists = false;
     notifyListeners();
   }
@@ -249,10 +276,11 @@ class DcrProvider with ChangeNotifier {
     try {
       _availableStockists =
           await _apiService.getStockistsForUser(_tseEmployeeId ?? 'TSE-10042');
-      _initStockistsPagination();
+      _applyStockistFilter();
     } catch (e) {
       _stockistsError = e.toString();
       _availableStockists = [];
+      _filteredStockists = [];
       _paginatedStockists = [];
     } finally {
       _isLoadingStockists = false;
@@ -506,6 +534,7 @@ class DcrProvider with ChangeNotifier {
     _selectedChemist = null;
     _selectedStockistIds.clear();
     _availableStockists.clear();
+    _filteredStockists.clear();
     _paginatedStockists.clear();
     _allProductsForStockists.clear();
     _filteredProducts.clear();
@@ -514,6 +543,7 @@ class DcrProvider with ChangeNotifier {
     _selectedBrandId = null;
     _productSearchQuery = '';
     _chemistSearchQuery = '';
+    _stockistSearchQuery = '';
     _currentLocation = null;
     _chemistsError = null;
     _stockistsError = null;
@@ -533,8 +563,10 @@ class DcrProvider with ChangeNotifier {
     _isLoadingMoreChemists = false;
 
     _availableStockists = [];
+    _filteredStockists = [];
     _paginatedStockists = [];
     _selectedStockistIds.clear();
+    _stockistSearchQuery = '';
     _isLoadingStockists = false;
     _hasMoreStockists = true;
     _isLoadingMoreStockists = false;
