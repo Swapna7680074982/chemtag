@@ -240,6 +240,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               icon: Icons.store_mall_directory_outlined,
               iconColor: AppColors.primary,
               onTap: () {
+                dcrProvider.resetWorkflow();
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const ChemistSelectionScreen()),
                 );

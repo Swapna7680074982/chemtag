@@ -224,12 +224,13 @@ class DcrProvider with ChangeNotifier {
     _productsError = null;
     notifyListeners();
 
-    // Fetch all stockists for any chemist (not linked)
+    // Fetch mapped stockists for this chemist
     _isLoadingStockists = true;
     notifyListeners();
 
     try {
-      _availableStockists = await _apiService.getAllStockists();
+      _availableStockists =
+          await _apiService.getStockistsForChemist(chemist.mappedStockistIds);
       _initStockistsPagination();
       await loadProductsForSelectedStockists();
     } catch (e) {
