@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import '../providers/auth_provider.dart';
 import '../providers/dcr_provider.dart';
 import '../core/constants/app_colors.dart';
@@ -87,67 +87,24 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           gradient: AppColors.primaryGradient,
         ),
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Logo with smooth scale and fade animations
-              AnimatedBuilder(
-                animation: _controller,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: _scaleAnimation.value,
-                    child: Opacity(
-                      opacity: _fadeAnimation.value,
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        height: 150,
-                        color: Colors.white,
-                        colorBlendMode: BlendMode.srcIn,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 24),
-              // App Title text
-              FadeTransition(
-                opacity: _fadeAnimation,
-                child: Text(
-                  'ChemTag',
-                  style: GoogleFonts.inter(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
+          // Logo with smooth scale and fade animations
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return Transform.scale(
+                scale: _scaleAnimation.value,
+                child: Opacity(
+                  opacity: _fadeAnimation.value,
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                    height: 150,
                     color: Colors.white,
-                    letterSpacing: 1.5,
+                    colorBlendMode: BlendMode.srcIn,
+                    fit: BoxFit.contain,
                   ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              // Subtitle text
-              FadeTransition(
-                opacity: _fadeAnimation,
-                child: Text(
-                  'DCR AUTOMATION SYSTEM',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: Colors.white.withValues(alpha: 0.7),
-                    letterSpacing: 2.0,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 48),
-              // Subtle modern loading indicator
-              SizedBox(
-                width: 28,
-                height: 28,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white.withValues(alpha: 0.8)),
-                ),
-              ),
-            ],
+              );
+            },
           ),
         ),
       ),
