@@ -8,7 +8,7 @@ class Product {
   final double ptr;
   final double mrp;
   final bool inStock;
-  final List<String> availableStockistIds;
+  final String tseEmployeeId;
 
   Product({
     required this.id,
@@ -20,7 +20,7 @@ class Product {
     required this.ptr,
     required this.mrp,
     this.inStock = true,
-    required this.availableStockistIds,
+    required this.tseEmployeeId,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -34,7 +34,7 @@ class Product {
       ptr: (json['ptr'] as num?)?.toDouble() ?? 0.0,
       mrp: (json['mrp'] as num?)?.toDouble() ?? 0.0,
       inStock: json['in_stock'] ?? true,
-      availableStockistIds: List<String>.from(json['available_stockist_ids'] ?? []),
+      tseEmployeeId: json['tse_employee_id'] ?? '',
     );
   }
 
@@ -48,6 +48,6 @@ class Product {
         'ptr': ptr,
         'mrp': mrp,
         'in_stock': inStock,
-        'available_stockist_ids': availableStockistIds,
+        'tse_employee_id': tseEmployeeId,
       };
 }

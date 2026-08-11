@@ -9,6 +9,7 @@ import '../core/utils/location_helper.dart';
 
 class DcrProvider with ChangeNotifier {
   final MockDcrService _apiService = MockDcrService();
+  String? _tseEmployeeId;
 
   // Page Sizes for Lazy Loading
   static const int _pageSizeChemists = 5;
@@ -134,7 +135,7 @@ class DcrProvider with ChangeNotifier {
             packSize: '',
             ptr: 0.0,
             mrp: 0.0,
-            availableStockistIds: [],
+            tseEmployeeId: '',
           ),
         );
         total += product.ptr * qty;
@@ -154,6 +155,7 @@ class DcrProvider with ChangeNotifier {
 
   // --- Step 1: Mapped Chemists ---
   Future<void> loadMappedChemists(String tseEmployeeId) async {
+    _tseEmployeeId = tseEmployeeId;
     _isLoadingChemists = true;
     _chemistsError = null;
     notifyListeners();
@@ -224,13 +226,13 @@ class DcrProvider with ChangeNotifier {
     _productsError = null;
     notifyListeners();
 
-    // Fetch mapped stockists for this chemist
+    // Fetch all stockists
     _isLoadingStockists = true;
     notifyListeners();
 
     try {
       _availableStockists =
-          await _apiService.getStockistsForChemist(chemist.mappedStockistIds);
+          await _apiService.getStockistsForUser(_tseEmployeeId ?? 'TSE-10042');
       _initStockistsPagination();
       await loadProductsForSelectedStockists();
     } catch (e) {
@@ -284,7 +286,7 @@ class DcrProvider with ChangeNotifier {
 
     try {
       _allProductsForStockists = await _apiService
-          .getProductsForStockists(_selectedStockistIds.toList());
+          .getProductsForUser(_tseEmployeeId ?? 'TSE-10042');
       _applyProductFilter();
     } catch (e) {
       _productsError = e.toString();

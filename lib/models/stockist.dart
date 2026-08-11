@@ -6,6 +6,7 @@ class Stockist {
   final String phone;
   final String address;
   final String city;
+  final String tseEmployeeId;
 
   Stockist({
     required this.id,
@@ -15,6 +16,7 @@ class Stockist {
     required this.phone,
     required this.address,
     required this.city,
+    required this.tseEmployeeId,
   });
 
   factory Stockist.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class Stockist {
       phone: json['phone'] ?? '',
       address: json['address'] ?? '',
       city: json['city'] ?? '',
+      tseEmployeeId: json['tse_employee_id'] ?? '',
     );
   }
 
@@ -37,5 +40,6 @@ class Stockist {
         'phone': phone,
         'address': address,
         'city': city,
+        'tse_employee_id': tseEmployeeId,
       };
 }

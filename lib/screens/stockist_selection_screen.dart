@@ -111,7 +111,7 @@ class _StockistSelectionScreenState extends State<StockistSelectionScreen> {
               children: [
                 const Expanded(
                   child: Text(
-                    'Mapped Stockists / Distributors',
+                    'Available Stockists / Distributors',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,

@@ -132,9 +132,9 @@ class ChemistCard extends StatelessWidget {
                             color: AppColors.primaryLight,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Text(
-                            '${chemist.mappedStockistIds.length} Stockists Mapped',
-                            style: const TextStyle(
+                          child: const Text(
+                            'All Stockists',
+                            style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
                               color: AppColors.primaryDark,

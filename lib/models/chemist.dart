@@ -8,7 +8,6 @@ class Chemist {
   final String phone;
   final String category;
   final String tseEmployeeId;
-  final List<String> mappedStockistIds;
 
   Chemist({
     required this.id,
@@ -20,7 +19,6 @@ class Chemist {
     required this.phone,
     required this.category,
     required this.tseEmployeeId,
-    required this.mappedStockistIds,
   });
 
   factory Chemist.fromJson(Map<String, dynamic> json) {
@@ -34,7 +32,6 @@ class Chemist {
       phone: json['phone'] ?? '',
       category: json['category'] ?? 'A',
       tseEmployeeId: json['tse_employee_id'] ?? '',
-      mappedStockistIds: List<String>.from(json['mapped_stockist_ids'] ?? []),
     );
   }
 
@@ -48,6 +45,5 @@ class Chemist {
         'phone': phone,
         'category': category,
         'tse_employee_id': tseEmployeeId,
-        'mapped_stockist_ids': mappedStockistIds,
       };
 }

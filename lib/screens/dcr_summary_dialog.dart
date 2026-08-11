@@ -149,6 +149,7 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
           phone: '',
           address: '',
           city: '',
+          tseEmployeeId: '',
         ),
       );
       groupedEntries.putIfAbsent(stockist, () => []).add(entry);
@@ -259,7 +260,7 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
                               packSize: '',
                               ptr: 0.0,
                               mrp: 0.0,
-                              availableStockistIds: [],
+                              tseEmployeeId: '',
                             ),
                           );
                           stockistSubtotal += product.ptr * entry.value;
@@ -317,7 +318,7 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
                                     packSize: '',
                                     ptr: 0.0,
                                     mrp: 0.0,
-                                    availableStockistIds: [],
+                                    tseEmployeeId: '',
                                   ),
                                 );
                                 double itemTotal = product.ptr * entry.value;

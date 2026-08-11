@@ -29,7 +29,6 @@ class MockDcrService {
       phone: '+91 98110 12345',
       category: 'A+',
       tseEmployeeId: 'TSE-10042',
-      mappedStockistIds: ['STK-001', 'STK-002', 'STK-003'],
     ),
     Chemist(
       id: 'CHM-102',
@@ -41,7 +40,6 @@ class MockDcrService {
       phone: '+91 98711 54321',
       category: 'A',
       tseEmployeeId: 'TSE-10042',
-      mappedStockistIds: ['STK-001', 'STK-004'],
     ),
     Chemist(
       id: 'CHM-103',
@@ -53,7 +51,6 @@ class MockDcrService {
       phone: '+91 99100 87654',
       category: 'A+',
       tseEmployeeId: 'TSE-10042',
-      mappedStockistIds: ['STK-002', 'STK-003'],
     ),
     Chemist(
       id: 'CHM-104',
@@ -65,7 +62,6 @@ class MockDcrService {
       phone: '+91 98990 33221',
       category: 'B',
       tseEmployeeId: 'TSE-10042',
-      mappedStockistIds: ['STK-001', 'STK-003', 'STK-004'],
     ),
     Chemist(
       id: 'CHM-105',
@@ -77,7 +73,6 @@ class MockDcrService {
       phone: '+91 98401 99887',
       category: 'A',
       tseEmployeeId: 'TSE-10042',
-      mappedStockistIds: ['STK-002', 'STK-004'],
     ),
     Chemist(
       id: 'CHM-106',
@@ -89,7 +84,6 @@ class MockDcrService {
       phone: '+91 98112 34567',
       category: 'A+',
       tseEmployeeId: 'TSE-10042',
-      mappedStockistIds: ['STK-001', 'STK-003', 'STK-005'],
     ),
     Chemist(
       id: 'CHM-107',
@@ -101,7 +95,6 @@ class MockDcrService {
       phone: '+91 98712 98765',
       category: 'A',
       tseEmployeeId: 'TSE-10042',
-      mappedStockistIds: ['STK-002', 'STK-005', 'STK-006'],
     ),
     Chemist(
       id: 'CHM-108',
@@ -113,7 +106,6 @@ class MockDcrService {
       phone: '+91 99102 33445',
       category: 'B',
       tseEmployeeId: 'TSE-10042',
-      mappedStockistIds: ['STK-003', 'STK-004', 'STK-006'],
     ),
     Chemist(
       id: 'CHM-109',
@@ -125,7 +117,6 @@ class MockDcrService {
       phone: '+91 98990 66778',
       category: 'A+',
       tseEmployeeId: 'TSE-10042',
-      mappedStockistIds: ['STK-001', 'STK-004', 'STK-005', 'STK-006'],
     ),
   ];
 
@@ -139,6 +130,7 @@ class MockDcrService {
       phone: '+91 98100 00111',
       address: 'Plot 42, Okhla Industrial Area Ph-III',
       city: 'New Delhi',
+      tseEmployeeId: 'TSE-10042',
     ),
     Stockist(
       id: 'STK-002',
@@ -148,6 +140,7 @@ class MockDcrService {
       phone: '+91 98111 22334',
       address: 'Building 14, Bhagirath Palace, Chandni Chowk',
       city: 'Delhi',
+      tseEmployeeId: 'TSE-10042',
     ),
     Stockist(
       id: 'STK-003',
@@ -157,6 +150,7 @@ class MockDcrService {
       phone: '+91 98999 55443',
       address: 'Sector 18, Udyog Vihar',
       city: 'Gurugram',
+      tseEmployeeId: 'TSE-10042',
     ),
     Stockist(
       id: 'STK-004',
@@ -166,6 +160,7 @@ class MockDcrService {
       phone: '+91 98122 77665',
       address: 'Pocket B, Naraina Industrial Area',
       city: 'New Delhi',
+      tseEmployeeId: 'TSE-10042',
     ),
     Stockist(
       id: 'STK-005',
@@ -175,6 +170,7 @@ class MockDcrService {
       phone: '+91 98115 55443',
       address: 'Industrial Area Phase I, Mayapuri',
       city: 'New Delhi',
+      tseEmployeeId: 'TSE-10042',
     ),
     Stockist(
       id: 'STK-006',
@@ -184,6 +180,7 @@ class MockDcrService {
       phone: '+91 98716 66778',
       address: 'Bhagirath Palace, Chandni Chowk',
       city: 'Delhi',
+      tseEmployeeId: 'TSE-10042',
     ),
   ];
 
@@ -233,7 +230,7 @@ class MockDcrService {
       ptr: 450.00,
       mrp: 520.00,
       inStock: true,
-      availableStockistIds: ['STK-001', 'STK-002', 'STK-003', 'STK-005'],
+      tseEmployeeId: 'TSE-10042',
     ),
     Product(
       id: 'PRD-102',
@@ -245,7 +242,7 @@ class MockDcrService {
       ptr: 320.00,
       mrp: 375.00,
       inStock: true,
-      availableStockistIds: ['STK-001', 'STK-002', 'STK-004', 'STK-006'],
+      tseEmployeeId: 'TSE-10042',
     ),
     Product(
       id: 'PRD-103',
@@ -257,7 +254,7 @@ class MockDcrService {
       ptr: 85.00,
       mrp: 105.00,
       inStock: true,
-      availableStockistIds: ['STK-001', 'STK-003', 'STK-004', 'STK-005'],
+      tseEmployeeId: 'TSE-10042',
     ),
     Product(
       id: 'PRD-201',
@@ -269,7 +266,7 @@ class MockDcrService {
       ptr: 110.00,
       mrp: 135.00,
       inStock: true,
-      availableStockistIds: ['STK-001', 'STK-002', 'STK-006'],
+      tseEmployeeId: 'TSE-10042',
     ),
     Product(
       id: 'PRD-202',
@@ -281,7 +278,7 @@ class MockDcrService {
       ptr: 175.00,
       mrp: 210.00,
       inStock: true,
-      availableStockistIds: ['STK-002', 'STK-003', 'STK-004', 'STK-005'],
+      tseEmployeeId: 'TSE-10042',
     ),
     Product(
       id: 'PRD-301',
@@ -293,7 +290,7 @@ class MockDcrService {
       ptr: 190.00,
       mrp: 230.00,
       inStock: true,
-      availableStockistIds: ['STK-001', 'STK-004', 'STK-006'],
+      tseEmployeeId: 'TSE-10042',
     ),
     Product(
       id: 'PRD-401',
@@ -305,7 +302,7 @@ class MockDcrService {
       ptr: 125.00,
       mrp: 150.00,
       inStock: true,
-      availableStockistIds: ['STK-002', 'STK-003', 'STK-005'],
+      tseEmployeeId: 'TSE-10042',
     ),
     Product(
       id: 'PRD-501',
@@ -317,7 +314,7 @@ class MockDcrService {
       ptr: 210.00,
       mrp: 260.00,
       inStock: true,
-      availableStockistIds: ['STK-001', 'STK-003', 'STK-004', 'STK-006'],
+      tseEmployeeId: 'TSE-10042',
     ),
     Product(
       id: 'PRD-104',
@@ -329,7 +326,7 @@ class MockDcrService {
       ptr: 45.00,
       mrp: 55.00,
       inStock: true,
-      availableStockistIds: ['STK-001', 'STK-002', 'STK-003', 'STK-005', 'STK-006'],
+      tseEmployeeId: 'TSE-10042',
     ),
     Product(
       id: 'PRD-105',
@@ -341,7 +338,7 @@ class MockDcrService {
       ptr: 150.00,
       mrp: 180.00,
       inStock: true,
-      availableStockistIds: ['STK-002', 'STK-003', 'STK-004', 'STK-005'],
+      tseEmployeeId: 'TSE-10042',
     ),
     Product(
       id: 'PRD-203',
@@ -353,7 +350,7 @@ class MockDcrService {
       ptr: 90.00,
       mrp: 110.00,
       inStock: true,
-      availableStockistIds: ['STK-001', 'STK-003', 'STK-004', 'STK-006'],
+      tseEmployeeId: 'TSE-10042',
     ),
     Product(
       id: 'PRD-204',
@@ -365,7 +362,7 @@ class MockDcrService {
       ptr: 115.00,
       mrp: 140.00,
       inStock: true,
-      availableStockistIds: ['STK-001', 'STK-002', 'STK-004', 'STK-005'],
+      tseEmployeeId: 'TSE-10042',
     ),
     Product(
       id: 'PRD-205',
@@ -377,7 +374,7 @@ class MockDcrService {
       ptr: 80.00,
       mrp: 98.00,
       inStock: true,
-      availableStockistIds: ['STK-002', 'STK-003', 'STK-006'],
+      tseEmployeeId: 'TSE-10042',
     ),
     Product(
       id: 'PRD-302',
@@ -389,7 +386,7 @@ class MockDcrService {
       ptr: 130.00,
       mrp: 160.00,
       inStock: true,
-      availableStockistIds: ['STK-001', 'STK-003', 'STK-005'],
+      tseEmployeeId: 'TSE-10042',
     ),
     Product(
       id: 'PRD-303',
@@ -401,7 +398,7 @@ class MockDcrService {
       ptr: 75.00,
       mrp: 95.00,
       inStock: true,
-      availableStockistIds: ['STK-002', 'STK-004', 'STK-006'],
+      tseEmployeeId: 'TSE-10042',
     ),
     Product(
       id: 'PRD-402',
@@ -413,7 +410,7 @@ class MockDcrService {
       ptr: 65.00,
       mrp: 80.00,
       inStock: true,
-      availableStockistIds: ['STK-001', 'STK-002', 'STK-004', 'STK-005'],
+      tseEmployeeId: 'TSE-10042',
     ),
     Product(
       id: 'PRD-403',
@@ -425,7 +422,7 @@ class MockDcrService {
       ptr: 35.00,
       mrp: 45.00,
       inStock: true,
-      availableStockistIds: ['STK-001', 'STK-003', 'STK-004', 'STK-006'],
+      tseEmployeeId: 'TSE-10042',
     ),
     Product(
       id: 'PRD-502',
@@ -437,7 +434,7 @@ class MockDcrService {
       ptr: 180.00,
       mrp: 220.00,
       inStock: true,
-      availableStockistIds: ['STK-001', 'STK-002', 'STK-003', 'STK-004', 'STK-005', 'STK-006'],
+      tseEmployeeId: 'TSE-10042',
     ),
   ];
 
@@ -457,20 +454,25 @@ class MockDcrService {
   Future<List<Chemist>> getMappedChemists(String tseEmployeeId) async {
     await Future.delayed(const Duration(milliseconds: 400));
     return _allChemists
-        .where((c) => c.tseEmployeeId == tseEmployeeId || true)
+        .where((c) => c.tseEmployeeId == tseEmployeeId)
         .toList();
   }
 
   Future<List<Stockist>> getStockistsForChemist(List<String> mappedStockistIds) async {
     await Future.delayed(const Duration(milliseconds: 300));
-    return _allStockists
-        .where((s) => mappedStockistIds.contains(s.id))
-        .toList();
+    return _allStockists;
   }
 
   Future<List<Stockist>> getAllStockists() async {
     await Future.delayed(const Duration(milliseconds: 300));
     return _allStockists;
+  }
+
+  Future<List<Stockist>> getStockistsForUser(String tseEmployeeId) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    return _allStockists
+        .where((s) => s.tseEmployeeId == tseEmployeeId)
+        .toList();
   }
 
   Future<List<Brand>> getBrands() async {
@@ -482,6 +484,13 @@ class MockDcrService {
     await Future.delayed(const Duration(milliseconds: 300));
     if (selectedStockistIds.isEmpty) return [];
     return _allProducts;
+  }
+
+  Future<List<Product>> getProductsForUser(String tseEmployeeId) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    return _allProducts
+        .where((p) => p.tseEmployeeId == tseEmployeeId)
+        .toList();
   }
 
   Future<bool> submitDcrReport(DcrSubmission submission) async {
