@@ -142,9 +142,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                           }
 
                           final product = dcrProvider.products[index];
-                          final availableSelectedStockists = dcrProvider.selectedStockistsList
-                              .where((s) => product.availableStockistIds.contains(s.id))
-                              .toList();
+                          final availableSelectedStockists = dcrProvider.selectedStockistsList;
 
                           return ProductItemCard(
                             product: product,

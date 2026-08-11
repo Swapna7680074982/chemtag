@@ -11,10 +11,10 @@ class DcrProvider with ChangeNotifier {
   final MockDcrService _apiService = MockDcrService();
 
   // Page Sizes for Lazy Loading
-  static const int _pageSizeChemists = 2;
-  static const int _pageSizeStockists = 2;
-  static const int _pageSizeProducts = 3;
-  static const int _pageSizeHistory = 3;
+  static const int _pageSizeChemists = 5;
+  static const int _pageSizeStockists = 5;
+  static const int _pageSizeProducts = 5;
+  static const int _pageSizeHistory = 5;
 
   // Mapped Chemists
   List<Chemist> _mappedChemists = [];
