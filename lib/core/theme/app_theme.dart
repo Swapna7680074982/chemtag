@@ -110,7 +110,7 @@ class AppTheme {
           borderSide: const BorderSide(color: AppColors.primary, width: 1.8),
         ),
         labelStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
-        hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 13),
+        hintStyle: const TextStyle(color: AppColors.hint, fontSize: 13),
       ),
     );
   }
