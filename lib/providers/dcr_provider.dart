@@ -34,6 +34,12 @@ class DcrProvider with ChangeNotifier {
   bool _hasMoreStockists = true;
   bool _isLoadingMoreStockists = false;
 
+  // Error States
+  String? _chemistsError;
+  String? _stockistsError;
+  String? _productsError;
+  String? _historyError;
+
   // Brands & Products Catalog
   List<Brand> _brands = [];
   String? _selectedBrandId; // null or 'ALL' means all brands
@@ -98,6 +104,12 @@ class DcrProvider with ChangeNotifier {
   bool get hasMoreHistory => _hasMoreHistory;
   bool get isLoadingMoreHistory => _isLoadingMoreHistory;
 
+  // Error Getters
+  String? get chemistsError => _chemistsError;
+  String? get stockistsError => _stockistsError;
+  String? get productsError => _productsError;
+  String? get historyError => _historyError;
+
   // Calculations
   int get totalItemsCount =>
       _productQuantities.values.where((qty) => qty > 0).length;
@@ -143,12 +155,21 @@ class DcrProvider with ChangeNotifier {
   // --- Step 1: Mapped Chemists ---
   Future<void> loadMappedChemists(String tseEmployeeId) async {
     _isLoadingChemists = true;
+    _chemistsError = null;
     notifyListeners();
 
-    _mappedChemists = await _apiService.getMappedChemists(tseEmployeeId);
-    _applyChemistFilter();
-    _isLoadingChemists = false;
-    notifyListeners();
+    try {
+      _mappedChemists = await _apiService.getMappedChemists(tseEmployeeId);
+      _applyChemistFilter();
+    } catch (e) {
+      _chemistsError = e.toString();
+      _mappedChemists = [];
+      _filteredChemists = [];
+      _paginatedChemists = [];
+    } finally {
+      _isLoadingChemists = false;
+      notifyListeners();
+    }
   }
 
   void filterChemists(String query) {
@@ -199,19 +220,26 @@ class DcrProvider with ChangeNotifier {
     _productQuantities.clear();
     _selectedBrandId = null;
     _productSearchQuery = '';
+    _stockistsError = null;
+    _productsError = null;
     notifyListeners();
 
     // Fetch all stockists for any chemist (not linked)
     _isLoadingStockists = true;
     notifyListeners();
 
-    _availableStockists = await _apiService.getAllStockists();
-    _initStockistsPagination();
-
-    await loadProductsForSelectedStockists();
-
-    _isLoadingStockists = false;
-    notifyListeners();
+    try {
+      _availableStockists = await _apiService.getAllStockists();
+      _initStockistsPagination();
+      await loadProductsForSelectedStockists();
+    } catch (e) {
+      _stockistsError = e.toString();
+      _availableStockists = [];
+      _paginatedStockists = [];
+    } finally {
+      _isLoadingStockists = false;
+      notifyListeners();
+    }
   }
 
   // --- Step 2: Multi-Stockist Selection ---
@@ -250,14 +278,22 @@ class DcrProvider with ChangeNotifier {
 
   Future<void> loadProductsForSelectedStockists() async {
     _isLoadingProducts = true;
+    _productsError = null;
     notifyListeners();
 
-    _allProductsForStockists = await _apiService
-        .getProductsForStockists(_selectedStockistIds.toList());
-    _applyProductFilter();
-
-    _isLoadingProducts = false;
-    notifyListeners();
+    try {
+      _allProductsForStockists = await _apiService
+          .getProductsForStockists(_selectedStockistIds.toList());
+      _applyProductFilter();
+    } catch (e) {
+      _productsError = e.toString();
+      _allProductsForStockists = [];
+      _filteredProducts = [];
+      _paginatedProducts = [];
+    } finally {
+      _isLoadingProducts = false;
+      notifyListeners();
+    }
   }
 
   // --- Step 3: Brand & Product Filter & Quantities ---
@@ -427,18 +463,27 @@ class DcrProvider with ChangeNotifier {
   void clearQuantities() {
     _productQuantities.clear();
     _currentLocation = null;
+    _productsError = null;
+    _historyError = null;
     notifyListeners();
   }
 
   Future<void> fetchDcrHistory() async {
     _isLoadingHistory = true;
+    _historyError = null;
     notifyListeners();
 
-    _dcrHistory = await _apiService.getDcrHistory();
-    _initHistoryPagination();
-
-    _isLoadingHistory = false;
-    notifyListeners();
+    try {
+      _dcrHistory = await _apiService.getDcrHistory();
+      _initHistoryPagination();
+    } catch (e) {
+      _historyError = e.toString();
+      _dcrHistory = [];
+      _paginatedHistory = [];
+    } finally {
+      _isLoadingHistory = false;
+      notifyListeners();
+    }
   }
 
   void _initHistoryPagination() {
@@ -474,6 +519,10 @@ class DcrProvider with ChangeNotifier {
     _selectedBrandId = null;
     _productSearchQuery = '';
     _currentLocation = null;
+    _chemistsError = null;
+    _stockistsError = null;
+    _productsError = null;
+    _historyError = null;
     notifyListeners();
   }
 }

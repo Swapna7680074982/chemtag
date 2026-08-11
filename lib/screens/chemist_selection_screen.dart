@@ -106,7 +106,55 @@ class _ChemistSelectionScreenState extends State<ChemistSelectionScreen> {
                   ? const Center(
                       child: CircularProgressIndicator(),
                     )
-                  : dcrProvider.chemists.isEmpty
+                  : dcrProvider.chemistsError != null
+                      ? Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(24.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.error_outline,
+                                  size: 56,
+                                  color: Colors.red,
+                                ),
+                                const SizedBox(height: 16),
+                                const Text(
+                                  'Failed to load chemists',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  dcrProvider.chemistsError!,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                ElevatedButton.icon(
+                                  onPressed: () =>
+                                      dcrProvider.loadMappedChemists(tseId),
+                                  icon: const Icon(Icons.refresh),
+                                  label: const Text('Retry'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primary,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : dcrProvider.chemists.isEmpty
                       ? Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
