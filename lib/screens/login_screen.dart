@@ -63,18 +63,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 140,
                   fit: BoxFit.contain,
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  'DCR Chemist & Field Force Automation',
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 32),
-
-                // Card Container
                 Card(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -177,13 +165,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                Text(
-                  'ChemTag v1.0.0 • Authorized Field Force Portal',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: AppColors.textMuted,
-                  ),
-                ),
               ],
             ),
           ),
