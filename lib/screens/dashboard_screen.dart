@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/auth_provider.dart';
 import '../providers/dcr_provider.dart';
+import '../widgets/gradient_button.dart';
 import '../core/constants/app_colors.dart';
 import 'chemist_selection_screen.dart';
 // import 'dcr_history_screen.dart';
@@ -38,6 +39,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: AppColors.headerGradient,
+          ),
+        ),
         title: Row(
           children: [
             Container(
@@ -84,7 +90,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: AppColors.primaryGradient,
+                gradient: AppColors.tseCardGradient,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -425,12 +431,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.danger,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
+          GradientButton(
+            height: 38,
             onPressed: () {
               Navigator.of(ctx).pop(); // Close dialog
               authProvider.logout();

@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../providers/dcr_provider.dart';
 import '../widgets/product_item_card.dart';
 import '../widgets/custom_text_field.dart';
+import '../widgets/gradient_button.dart';
 import '../core/constants/app_colors.dart';
 import 'dcr_summary_dialog.dart';
 
@@ -53,6 +54,11 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: AppColors.headerGradient,
+          ),
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -146,18 +152,11 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                                 ),
                               ),
                               const SizedBox(height: 24),
-                              ElevatedButton.icon(
+                              GradientButton(
                                 onPressed: () =>
                                     dcrProvider.loadProductsForSelectedStockists(),
-                                icon: const Icon(Icons.refresh),
-                                label: const Text('Retry'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primary,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
+                                icon: Icons.refresh,
+                                child: const Text('Retry'),
                               ),
                             ],
                           ),
@@ -271,12 +270,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                         ],
                       ),
                       const Spacer(),
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 14),
-                          backgroundColor: AppColors.primary,
-                        ),
+                      GradientButton(
                         onPressed: dcrProvider.totalItemsCount == 0
                             ? null
                             : () {
@@ -286,8 +280,8 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                                   builder: (_) => const DcrSummaryDialog(),
                                 );
                               },
-                        icon: const Icon(Icons.rate_review_outlined, size: 18),
-                        label: const Text('Review'),
+                        icon: Icons.rate_review_outlined,
+                        child: const Text('Review'),
                       ),
                     ],
                   ),

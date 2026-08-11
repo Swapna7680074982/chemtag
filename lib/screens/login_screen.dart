@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../providers/auth_provider.dart';
 import '../providers/dcr_provider.dart';
 import '../widgets/custom_text_field.dart';
+import '../widgets/gradient_button.dart';
 import '../core/constants/app_colors.dart';
 import 'dashboard_screen.dart';
 
@@ -143,21 +144,19 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ],
                           const SizedBox(height: 24),
-                          SizedBox(
+                          GradientButton(
                             width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: authProvider.isLoading ? null : _handleLogin,
-                              child: authProvider.isLoading
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : const Text('Log In as TSE'),
-                            ),
+                            onPressed: authProvider.isLoading ? null : _handleLogin,
+                            child: authProvider.isLoading
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text('Log In as TSE'),
                           ),
                         ],
                       ),

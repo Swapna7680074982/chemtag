@@ -47,6 +47,11 @@ class _DcrHistoryScreenState extends State<DcrHistoryScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: AppColors.headerGradient,
+          ),
+        ),
         title: Text(
           'DCR Submissions & Geo-Logs',
           style: GoogleFonts.inter(

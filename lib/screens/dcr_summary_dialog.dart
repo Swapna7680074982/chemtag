@@ -5,6 +5,7 @@ import '../providers/auth_provider.dart';
 import '../providers/dcr_provider.dart';
 import '../models/stockist.dart';
 import '../models/product.dart';
+import '../widgets/gradient_button.dart';
 import '../core/constants/app_colors.dart';
 
 class DcrSummaryDialog extends StatefulWidget {
@@ -94,19 +95,13 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
-              SizedBox(
+              GradientButton(
                 width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.of(ctx).popUntil((route) => route.isFirst);
-                  },
-                  icon: const Icon(Icons.home_rounded, size: 18),
-                  label: const Text('Go to Dashboard'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                ),
+                onPressed: () {
+                  Navigator.of(ctx).popUntil((route) => route.isFirst);
+                },
+                icon: Icons.home_rounded,
+                child: const Text('Go to Dashboard'),
               ),
               const SizedBox(height: 10),
               SizedBox(
@@ -131,6 +126,10 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
   @override
   Widget build(BuildContext context) {
     final dcrProvider = Provider.of<DcrProvider>(context);
+    final bool isSubmitEnabled = !(dcrProvider.isSubmitting ||
+        dcrProvider.isCapturingLocation ||
+        dcrProvider.currentLocation == null ||
+        dcrProvider.currentLocation!.errorMessage != null);
 
     // Group selected entries by stockist
     final Map<Stockist, List<MapEntry<String, int>>> groupedEntries = {};
@@ -417,40 +416,30 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
                       const SizedBox(height: 20),
 
                       // Submit Action Button
-                      SizedBox(
+                      GradientButton(
                         width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          onPressed: (dcrProvider.isSubmitting ||
-                                  dcrProvider.isCapturingLocation ||
-                                  dcrProvider.currentLocation == null ||
-                                  dcrProvider.currentLocation!.errorMessage != null)
-                              ? null
-                              : _handleSubmit,
-                          child: dcrProvider.isSubmitting
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.send_rounded, size: 18),
-                                    SizedBox(width: 8),
-                                    Text('Submit'),
-                                  ],
+                        onPressed: isSubmitEnabled ? _handleSubmit : null,
+                        child: dcrProvider.isSubmitting
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
                                 ),
-                        ),
+                              )
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.send_rounded,
+                                    size: 18,
+                                    color: isSubmitEnabled ? Colors.white : Colors.grey.shade600,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text('Submit'),
+                                ],
+                              ),
                       ),
                     ],
                   ),

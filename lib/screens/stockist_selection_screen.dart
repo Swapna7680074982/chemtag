@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../providers/dcr_provider.dart';
 import '../widgets/stockist_chip.dart';
 import '../widgets/custom_text_field.dart';
+import '../widgets/gradient_button.dart';
 import '../core/constants/app_colors.dart';
 import 'product_catalog_screen.dart';
 
@@ -55,6 +56,11 @@ class _StockistSelectionScreenState extends State<StockistSelectionScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: AppColors.headerGradient,
+          ),
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -84,7 +90,9 @@ class _StockistSelectionScreenState extends State<StockistSelectionScreen> {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
-            color: AppColors.primaryDark,
+            decoration: const BoxDecoration(
+              gradient: AppColors.headerGradient,
+            ),
             child: Row(
               children: [
                 const Icon(Icons.storefront, color: Colors.white, size: 28),
@@ -218,21 +226,14 @@ class _StockistSelectionScreenState extends State<StockistSelectionScreen> {
                                 ),
                               ),
                               const SizedBox(height: 24),
-                              ElevatedButton.icon(
+                              GradientButton(
                                 onPressed: () {
                                   if (chemist != null) {
                                     dcrProvider.selectChemist(chemist);
                                   }
                                 },
-                                icon: const Icon(Icons.refresh),
-                                label: const Text('Retry'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primary,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
+                                icon: Icons.refresh,
+                                child: const Text('Retry'),
                               ),
                             ],
                           ),
@@ -321,7 +322,7 @@ class _StockistSelectionScreenState extends State<StockistSelectionScreen> {
             child: SafeArea(
               child: SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: GradientButton(
                   onPressed: selectedCount == 0
                       ? null
                       : () {
@@ -336,7 +337,11 @@ class _StockistSelectionScreenState extends State<StockistSelectionScreen> {
                     children: [
                       Text('Proceed to Product Entry ($selectedCount Stockists)'),
                       const SizedBox(width: 8),
-                      const Icon(Icons.arrow_forward, size: 18),
+                      Icon(
+                        Icons.arrow_forward,
+                        size: 18,
+                        color: selectedCount > 0 ? Colors.white : Colors.grey.shade600,
+                      ),
                     ],
                   ),
                 ),

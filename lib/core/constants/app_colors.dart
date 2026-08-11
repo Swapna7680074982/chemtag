@@ -23,13 +23,13 @@ class AppColors {
   static const Color info = Color(0xFF0284C7);
   static const Color infoLight = Color(0xFFF0F9FF);
   static const LinearGradient primaryGradient = LinearGradient(
-    colors: [Color(0xFF1E3A8A), Color(0xFF2563EB)],
+    colors: [Color(0xFF1E3A8A), Color(0xFF1D4ED8)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const LinearGradient headerGradient = LinearGradient(
-    colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
+    colors: [Color(0xFF1E3A8A), Color(0xFF2563EB)],
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
   );
@@ -42,6 +42,12 @@ class AppColors {
 
   static const LinearGradient summaryGradient = LinearGradient(
     colors: [Color(0xFFF8FAFC), Color(0xFFEFF6FF)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient tseCardGradient = LinearGradient(
+    colors: [Color(0xFF2563EB), Color(0xFF3B82F6)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

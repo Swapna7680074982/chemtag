@@ -5,6 +5,7 @@ import '../providers/auth_provider.dart';
 import '../providers/dcr_provider.dart';
 import '../widgets/chemist_card.dart';
 import '../widgets/custom_text_field.dart';
+import '../widgets/gradient_button.dart';
 import '../core/constants/app_colors.dart';
 import 'stockist_selection_screen.dart';
 
@@ -59,6 +60,11 @@ class _ChemistSelectionScreenState extends State<ChemistSelectionScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: AppColors.headerGradient,
+          ),
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -163,18 +169,11 @@ class _ChemistSelectionScreenState extends State<ChemistSelectionScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 24),
-                                ElevatedButton.icon(
+                                GradientButton(
                                   onPressed: () =>
                                       dcrProvider.loadMappedChemists(tseId),
-                                  icon: const Icon(Icons.refresh),
-                                  label: const Text('Retry'),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primary,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
+                                  icon: Icons.refresh,
+                                  child: const Text('Retry'),
                                 ),
                               ],
                             ),
