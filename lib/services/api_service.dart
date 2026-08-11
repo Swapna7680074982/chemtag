@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -80,6 +81,9 @@ class ApiService {
       response = await http.get(uri, headers: headers);
     }
 
+    print('API Request ($method $urlPath) Response Status: ${response.statusCode}');
+    print('API Request ($method $urlPath) Response Body: ${response.body}');
+
     // Check if token expired (401) and we have a refresh token
     if (response.statusCode == 401 && _refreshToken != null) {
       final refreshSuccess = await refreshSessionToken();
@@ -92,6 +96,8 @@ class ApiService {
         } else {
           response = await http.get(uri, headers: retryHeaders);
         }
+        print('API Retry Request ($method $urlPath) Response Status: ${response.statusCode}');
+        print('API Retry Request ($method $urlPath) Response Body: ${response.body}');
       }
     }
 
@@ -117,6 +123,9 @@ class ApiService {
       body: jsonEncode(payload),
     );
 
+    print('Login Response Status: ${response.statusCode}');
+    print('Login Response Body: ${response.body}');
+
     if (response.statusCode == 200 || response.statusCode == 201) {
       final data = jsonDecode(response.body);
       if (data['status'] == true) {
@@ -139,7 +148,7 @@ class ApiService {
         throw Exception(data['message'] ?? 'Login failed.');
       }
     } else {
-      throw Exception('Server error: ${response.statusCode}');
+      throw Exception(_getErrorMessage(response));
     }
   }
 
@@ -159,6 +168,9 @@ class ApiService {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(payload),
       );
+
+      print('Refresh Token Response Status: ${response.statusCode}');
+      print('Refresh Token Response Body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
@@ -239,7 +251,7 @@ class ApiService {
         throw Exception(data['message'] ?? 'Failed to fetch profile.');
       }
     } else {
-      throw Exception('Server error: ${response.statusCode}');
+      throw Exception(_getErrorMessage(response));
     }
   }
 
@@ -283,7 +295,7 @@ class ApiService {
         throw Exception(data['message'] ?? 'Failed to fetch chemists.');
       }
     } else {
-      throw Exception('Server error: ${response.statusCode}');
+      throw Exception(_getErrorMessage(response));
     }
   }
 
@@ -303,7 +315,7 @@ class ApiService {
         throw Exception(data['message'] ?? 'Failed to fetch stockists.');
       }
     } else {
-      throw Exception('Server error: ${response.statusCode}');
+      throw Exception(_getErrorMessage(response));
     }
   }
 
@@ -323,7 +335,7 @@ class ApiService {
         throw Exception(data['message'] ?? 'Failed to fetch products.');
       }
     } else {
-      throw Exception('Server error: ${response.statusCode}');
+      throw Exception(_getErrorMessage(response));
     }
   }
 
@@ -355,7 +367,7 @@ class ApiService {
       final data = jsonDecode(response.body);
       return data['status'] == true;
     } else {
-      throw Exception('Server error during DCR submission: ${response.statusCode}');
+      throw Exception(_getErrorMessage(response, defaultMessage: 'Server error during DCR submission'));
     }
   }
 
@@ -372,7 +384,24 @@ class ApiService {
         throw Exception(data['message'] ?? 'Failed to fetch DCR history.');
       }
     } else {
-      throw Exception('Server error: ${response.statusCode}');
+      throw Exception(_getErrorMessage(response));
     }
+  }
+
+  String _getErrorMessage(http.Response response, {String defaultMessage = 'Server error'}) {
+    try {
+      if (response.body.isNotEmpty) {
+        final data = jsonDecode(response.body);
+        if (data is Map) {
+          if (data['message'] != null) {
+            return data['message'].toString();
+          }
+          if (data['error'] != null) {
+            return data['error'].toString();
+          }
+        }
+      }
+    } catch (_) {}
+    return '$defaultMessage: ${response.statusCode}';
   }
 }

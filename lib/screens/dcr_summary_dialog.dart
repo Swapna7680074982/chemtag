@@ -39,15 +39,22 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
     final navigator = Navigator.of(context);
 
     final tse = authProvider.currentUser;
-    bool success = await dcrProvider.submitDcr(
-      tseEmployeeId: tse?.employeeId ?? '13995',
-      tseName: tse?.name ?? 'TSE User',
-      notes: _notesController.text.trim(),
-    );
+    try {
+      bool success = await dcrProvider.submitDcr(
+        tseEmployeeId: tse?.employeeId ?? '13995',
+        tseName: tse?.name ?? 'TSE User',
+        notes: _notesController.text.trim(),
+      );
 
-    if (success && mounted) {
-      navigator.pop(); // Remove review dialog popup
-      _showSuccessDialog(context);
+      if (success && mounted) {
+        navigator.pop(); // Remove review dialog popup
+        _showSuccessDialog(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        final cleanMsg = e.toString().replaceFirst('Exception: ', '');
+        _showErrorDialog(context, cleanMsg);
+      }
     }
   }
 
@@ -115,6 +122,65 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
                   ),
                   child: const Text('Stay on Products'),
                 ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showErrorDialog(BuildContext parentContext, String message) {
+    showDialog(
+      context: parentContext,
+      barrierDismissible: true,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        content: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 68,
+                height: 68,
+                decoration: const BoxDecoration(
+                  color: AppColors.dangerLight,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.error_outline_rounded,
+                  color: AppColors.danger,
+                  size: 48,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Submission Failed',
+                style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                message,
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: AppColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              GradientButton(
+                width: double.infinity,
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                },
+                icon: Icons.close_rounded,
+                child: const Text('Close'),
               ),
             ],
           ),

@@ -145,7 +145,7 @@ class DcrProvider with ChangeNotifier {
       _mappedChemists = await _apiService.getMappedChemists(tseEmployeeId);
       _applyChemistFilter();
     } catch (e) {
-      _chemistsError = e.toString();
+      _chemistsError = e.toString().replaceFirst('Exception: ', '');
       _mappedChemists = [];
       _filteredChemists = [];
       _paginatedChemists = [];
@@ -235,7 +235,7 @@ class DcrProvider with ChangeNotifier {
       _applyStockistFilter();
       await loadProductsForSelectedStockists();
     } catch (e) {
-      _stockistsError = e.toString();
+      _stockistsError = e.toString().replaceFirst('Exception: ', '');
       _availableStockists = [];
       _filteredStockists = [];
       _paginatedStockists = [];
@@ -316,7 +316,7 @@ class DcrProvider with ChangeNotifier {
           await _apiService.getStockistsForUser(_tseEmployeeId ?? 'TSE-10042');
       _applyStockistFilter();
     } catch (e) {
-      _stockistsError = e.toString();
+      _stockistsError = e.toString().replaceFirst('Exception: ', '');
       _availableStockists = [];
       _filteredStockists = [];
       _paginatedStockists = [];
@@ -363,7 +363,7 @@ class DcrProvider with ChangeNotifier {
 
       _applyProductFilter();
     } catch (e) {
-      _productsError = e.toString();
+      _productsError = e.toString().replaceFirst('Exception: ', '');
       _allProductsForStockists = [];
       _filteredProducts = [];
       _paginatedProducts = [];
@@ -540,17 +540,23 @@ class DcrProvider with ChangeNotifier {
       notes: notes,
     );
 
-    bool success = await _apiService.submitDcrReport(submission);
+    try {
+      bool success = await _apiService.submitDcrReport(submission);
 
-    if (success) {
-      // Reload DCR history from backend to get the server-assigned order IDs/No
-      await fetchDcrHistory();
-      clearQuantities();
+      if (success) {
+        // Reload DCR history from backend to get the server-assigned order IDs/No
+        await fetchDcrHistory();
+        clearQuantities();
+      }
+
+      _isSubmitting = false;
+      notifyListeners();
+      return success;
+    } catch (e) {
+      _isSubmitting = false;
+      notifyListeners();
+      rethrow;
     }
-
-    _isSubmitting = false;
-    notifyListeners();
-    return success;
   }
 
   void clearQuantities() {
@@ -570,7 +576,7 @@ class DcrProvider with ChangeNotifier {
       _dcrHistory = await _apiService.getDcrHistory();
       _initHistoryPagination();
     } catch (e) {
-      _historyError = e.toString();
+      _historyError = e.toString().replaceFirst('Exception: ', '');
       _dcrHistory = [];
       _paginatedHistory = [];
     } finally {
