@@ -68,7 +68,7 @@ class StockistCard extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              stockist.name,
+                              stockist.stockistName,
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -87,7 +87,7 @@ class StockistCard extends StatelessWidget {
                               border: Border.all(color: AppColors.border),
                             ),
                             child: Text(
-                              stockist.code,
+                              'SAP ID: ${stockist.stockistSapId}',
                               style: const TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
@@ -97,23 +97,30 @@ class StockistCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Contact: ${stockist.contactPerson} (${stockist.phone})',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textSecondary,
-                        ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          const Icon(Icons.business_outlined,
+                              size: 13, color: AppColors.primary),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Division SAP ID: ${stockist.divisionSapId}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          const Icon(Icons.business_outlined,
+                          const Icon(Icons.location_city_outlined,
                               size: 13, color: AppColors.textMuted),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
-                              '${stockist.address}, ${stockist.city}',
+                              'HQ: ${stockist.hqName} • City SAP ID: ${stockist.citySapId}',
                               style: const TextStyle(
                                 fontSize: 11,
                                 color: AppColors.textMuted,

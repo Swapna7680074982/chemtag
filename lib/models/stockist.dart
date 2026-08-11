@@ -1,45 +1,56 @@
 class Stockist {
-  final String id;
-  final String name;
-  final String code;
-  final String contactPerson;
-  final String phone;
-  final String address;
-  final String city;
-  final String tseEmployeeId;
+  final String stockistSapId;
+  final String stockistName;
+  final String divisionSapId;
+  final String citySapId;
+  final String hqName;
 
   Stockist({
-    required this.id,
-    required this.name,
-    required this.code,
-    required this.contactPerson,
-    required this.phone,
-    required this.address,
-    required this.city,
-    required this.tseEmployeeId,
-  });
+    String? stockistSapId,
+    String? stockistName,
+    String? divisionSapId,
+    String? citySapId,
+    String? hqName,
+    // Legacy constructor compatibility
+    String? id,
+    String? name,
+    String? code,
+    String? contactPerson,
+    String? phone,
+    String? address,
+    String? city,
+    String? tseEmployeeId,
+  })  : stockistSapId = stockistSapId ?? code ?? id ?? '',
+        stockistName = stockistName ?? name ?? '',
+        divisionSapId = divisionSapId ?? '',
+        citySapId = citySapId ?? '',
+        hqName = hqName ?? address ?? city ?? '';
+
+  // Backward compatibility getters
+  String get id => stockistSapId;
+  String get name => stockistName;
+  String get code => stockistSapId;
+  String get contactPerson => 'N/A';
+  String get phone => 'N/A';
+  String get address => hqName;
+  String get city => hqName;
+  String get tseEmployeeId => '';
 
   factory Stockist.fromJson(Map<String, dynamic> json) {
     return Stockist(
-      id: json['stockistSapId'] ?? json['id'] ?? '',
-      name: json['stockistName'] ?? json['name'] ?? '',
-      code: json['stockistSapId'] ?? json['code'] ?? '',
-      contactPerson: json['contactPerson'] ?? json['contact_person'] ?? 'N/A',
-      phone: json['phone'] ?? 'N/A',
-      address: json['hqName'] ?? json['address'] ?? '',
-      city: json['hqName'] ?? json['city'] ?? '',
-      tseEmployeeId: json['tseEmployeeId'] ?? json['tse_employee_id'] ?? '',
+      stockistSapId: json['stockistSapId'] ?? json['stockist_sap_id'] ?? '',
+      stockistName: json['stockistName'] ?? json['stockist_name'] ?? '',
+      divisionSapId: json['divisionSapId'] ?? json['division_sap_id'] ?? '',
+      citySapId: json['citySapId'] ?? json['city_sap_id'] ?? '',
+      hqName: json['hqName'] ?? json['hq_name'] ?? '',
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'code': code,
-        'contact_person': contactPerson,
-        'phone': phone,
-        'address': address,
-        'city': city,
-        'tse_employee_id': tseEmployeeId,
+        'stockistSapId': stockistSapId,
+        'stockistName': stockistName,
+        'divisionSapId': divisionSapId,
+        'citySapId': citySapId,
+        'hqName': hqName,
       };
 }

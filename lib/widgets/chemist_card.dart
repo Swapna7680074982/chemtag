@@ -58,7 +58,7 @@ class ChemistCard extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            chemist.storeName,
+                            chemist.chemistName,
                             style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
@@ -66,13 +66,30 @@ class ChemistCard extends StatelessWidget {
                             ),
                           ),
                         ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.background,
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: AppColors.border),
+                          ),
+                          child: Text(
+                            chemist.chemistcode,
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryDark,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Owner: ${chemist.ownerName}',
+                      'TSE/MR: ${chemist.empName} (Code: ${chemist.empCode})',
                       style: const TextStyle(
-                        fontSize: 13,
+                        fontSize: 12.5,
                         color: AppColors.textSecondary,
                       ),
                     ),
@@ -80,13 +97,13 @@ class ChemistCard extends StatelessWidget {
                     Row(
                       children: [
                         const Icon(Icons.location_on_outlined,
-                            size: 14, color: AppColors.textMuted),
+                            size: 13, color: AppColors.textMuted),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            chemist.locality,
+                            'Region: ${chemist.region} • HQ: ${chemist.hq}',
                             style: const TextStyle(
-                              fontSize: 12,
+                              fontSize: 11.5,
                               color: AppColors.textMuted,
                             ),
                             maxLines: 1,
@@ -98,18 +115,39 @@ class ChemistCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        const Icon(Icons.verified_outlined,
-                            size: 14, color: AppColors.primary),
+                        const Icon(Icons.business_rounded,
+                            size: 13, color: AppColors.primary),
                         const SizedBox(width: 4),
-                        Text(
-                          chemist.licenseNo,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: AppColors.textSecondary,
+                        Expanded(
+                          child: Text(
+                            'Division: ${chemist.division} (Code: ${chemist.divisionCode})',
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              color: AppColors.textSecondary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
                     ),
+                    if (chemist.mobileNumber.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(Icons.phone_outlined,
+                              size: 13, color: AppColors.success),
+                          const SizedBox(width: 4),
+                          Text(
+                            chemist.mobileNumber,
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),

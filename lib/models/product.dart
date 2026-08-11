@@ -1,23 +1,43 @@
 class Product {
-  final String id;
-  final String name;
-  final String skuCode;
-  final String brandId;
-  final String brandName;
+  final String productId;
+  final String productCode;
+  final String materialCode;
+  final String productName;
+  final String materialName;
+  final String divisionCode;
   final String packSize;
-  final bool inStock;
-  final String tseEmployeeId;
+  final String unit;
 
   Product({
-    required this.id,
-    required this.name,
-    required this.skuCode,
-    required this.brandId,
-    required this.brandName,
+    required String id,
+    required String name,
+    required String skuCode,
+    required String brandId,
+    required String brandName,
     required this.packSize,
-    this.inStock = true,
-    required this.tseEmployeeId,
-  });
+    String? tseEmployeeId,
+    String? unit,
+    String? productCode,
+    String? materialCode,
+    String? productName,
+    String? materialName,
+    String? divisionCode,
+  })  : productId = id,
+        productName = productName ?? name,
+        materialCode = materialCode ?? skuCode,
+        divisionCode = divisionCode ?? brandId,
+        productCode = productCode ?? id,
+        materialName = materialName ?? name,
+        unit = unit ?? '';
+
+  // Backward compatibility getters
+  String get id => productId;
+  String get name => productName;
+  String get skuCode => materialCode;
+  String get brandId => divisionCode;
+  String get brandName => "Division $divisionCode";
+  bool get inStock => true;
+  String get tseEmployeeId => '';
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
@@ -27,19 +47,21 @@ class Product {
       brandId: json['divisionCode'] ?? json['brand_id'] ?? '',
       brandName: json['divisionName'] ?? (json['divisionCode'] != null ? "Division ${json['divisionCode']}" : json['brand_name'] ?? ''),
       packSize: json['packSize'] ?? json['pack_size'] ?? '',
-      inStock: json['in_stock'] ?? true,
-      tseEmployeeId: json['tse_employee_id'] ?? '',
+      unit: json['unit'] ?? '',
+      productCode: json['productCode'] ?? '',
+      materialName: json['materialName'] ?? '',
+      divisionCode: json['divisionCode'] ?? '',
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'sku_code': skuCode,
-        'brand_id': brandId,
-        'brand_name': brandName,
-        'pack_size': packSize,
-        'in_stock': inStock,
-        'tse_employee_id': tseEmployeeId,
+        'productId': productId,
+        'productCode': productCode,
+        'materialCode': materialCode,
+        'productName': productName,
+        'materialName': materialName,
+        'divisionCode': divisionCode,
+        'packSize': packSize,
+        'unit': unit,
       };
 }

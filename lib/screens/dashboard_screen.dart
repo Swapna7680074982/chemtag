@@ -8,7 +8,6 @@ import '../core/constants/app_colors.dart';
 import 'chemist_selection_screen.dart';
 import 'dcr_history_screen.dart';
 import 'login_screen.dart';
-import 'system_info_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -107,14 +106,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Row(
                     children: [
                       Container(
-                        width: 50,
-                        height: 50,
+                        width: 58,
+                        height: 58,
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.8), width: 1.5),
                         ),
-                        child: const Center(
-                          child: Icon(Icons.person, color: Colors.white, size: 28),
+                        child: ClipOval(
+                          child: user?.pic != null && user!.pic.isNotEmpty
+                              ? Image.network(
+                                  user.pic,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) => const Icon(
+                                    Icons.person,
+                                    color: Colors.white,
+                                    size: 32,
+                                  ),
+                                  loadingBuilder: (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return const Center(
+                                      child: SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 1.5,
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                )
+                              : const Icon(
+                                  Icons.person,
+                                  color: Colors.white,
+                                  size: 32,
+                                ),
                         ),
                       ),
                       const SizedBox(width: 14),
@@ -125,38 +152,74 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             Text(
                               user?.name ?? 'TSE User',
                               style: const TextStyle(
-                                fontSize: 18,
+                                fontSize: 17,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              'ID: ${user?.employeeId ?? "TSE-10042"} • ${user?.designation ?? "Territory Sales Executive"}',
+                              'ID: ${user?.employeeId ?? ""} • ${user?.designation ?? "TSE"}',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.white.withValues(alpha: 0.85),
                               ),
                             ),
+                            if (user?.buName != null && user!.buName.isNotEmpty) ...[
+                              const SizedBox(height: 2),
+                              Text(
+                                'BU: ${user.buName}',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.white.withValues(alpha: 0.85),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),
                     ],
                   ),
-                  const Divider(color: Colors.white24, height: 24),
+                  const Divider(color: Colors.white24, height: 20),
+                  // Division
                   Row(
                     children: [
-                      const Icon(Icons.map_outlined, size: 16, color: Colors.white70),
+                      const Icon(Icons.business_rounded, size: 15, color: Colors.white70),
                       const SizedBox(width: 6),
-                      Text(
-                        user?.territory ?? 'Delhi NCR Region',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
+                      Expanded(
+                        child: Text(
+                          'Division: ${user?.divisionName != null && user!.divisionName.isNotEmpty ? user.divisionName : "N/A"}',
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const Spacer(),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  // Region & State
+                  Row(
+                    children: [
+                      const Icon(Icons.map_outlined, size: 15, color: Colors.white70),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          'Region: ${user?.region != null && user!.region.isNotEmpty ? user.region : "N/A"}${user?.state != null && user!.state.isNotEmpty ? " (${user.state})" : ""}',
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
@@ -164,9 +227,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          user?.hqCity ?? 'HQ New Delhi',
+                          'HQ: ${user?.hqCity != null && user!.hqCity.isNotEmpty ? user.hqCity : "N/A"}',
                           style: const TextStyle(
-                            fontSize: 11,
+                            fontSize: 10.5,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -266,19 +329,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 );
               },
             ),
-            const SizedBox(height: 12),
 
-            _buildActionCard(
-              title: 'Device & API Information',
-              subtitle: 'View device profile metadata & TSE Chemist App API documentation',
-              icon: Icons.info_outline_rounded,
-              iconColor: AppColors.primary,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const SystemInfoScreen()),
-                );
-              },
-            ),
           ],
         ),
       ),

@@ -102,7 +102,7 @@ class _StockistSelectionScreenState extends State<StockistSelectionScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        chemist?.storeName ?? '',
+                        chemist?.chemistName ?? '',
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
@@ -110,7 +110,7 @@ class _StockistSelectionScreenState extends State<StockistSelectionScreen> {
                         ),
                       ),
                       Text(
-                        'Locality: ${chemist?.locality ?? ""} • License: ${chemist?.licenseNo ?? ""}',
+                        'Region: ${chemist?.region ?? ""} • Division: ${chemist?.division ?? ""}',
                         style: TextStyle(
                           fontSize: 11,
                           color: Colors.white.withValues(alpha: 0.8),

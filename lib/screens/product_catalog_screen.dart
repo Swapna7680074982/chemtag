@@ -72,7 +72,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
             ),
             const SizedBox(height: 2),
             Text(
-              '${dcrProvider.selectedChemist?.storeName ?? "Chemist"} • ${dcrProvider.selectedStockistsList.map((s) => s.code).join(", ")}',
+              '${dcrProvider.selectedChemist?.chemistName ?? "Chemist"} • ${dcrProvider.selectedStockistsList.map((s) => s.stockistSapId).join(", ")}',
               style: GoogleFonts.inter(
                 fontSize: 11,
                 fontWeight: FontWeight.w400,

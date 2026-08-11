@@ -1,49 +1,78 @@
 class Chemist {
-  final String id;
-  final String storeName;
-  final String ownerName;
-  final String licenseNo;
-  final String locality;
-  final String city;
-  final String phone;
-  final String category;
-  final String tseEmployeeId;
+  final String divisionCode;
+  final String division;
+  final String region;
+  final String hq;
+  final String empCode;
+  final String empName;
+  final String chemistcode;
+  final String chemistName;
+  final String mobileNumber;
 
   Chemist({
-    required this.id,
-    required this.storeName,
-    required this.ownerName,
-    required this.licenseNo,
-    required this.locality,
-    required this.city,
-    required this.phone,
-    required this.category,
-    required this.tseEmployeeId,
-  });
+    String? divisionCode,
+    String? division,
+    String? region,
+    String? hq,
+    String? empCode,
+    String? empName,
+    String? chemistcode,
+    String? chemistName,
+    String? mobileNumber,
+    // Legacy constructor compatibility
+    String? id,
+    String? storeName,
+    String? ownerName,
+    String? licenseNo,
+    String? locality,
+    String? city,
+    String? phone,
+    String? category,
+    String? tseEmployeeId,
+  })  : divisionCode = divisionCode ?? licenseNo ?? '',
+        division = division ?? licenseNo ?? '',
+        region = region ?? locality ?? '',
+        hq = hq ?? city ?? '',
+        empCode = empCode ?? tseEmployeeId ?? '',
+        empName = empName ?? ownerName ?? '',
+        chemistcode = chemistcode ?? id ?? '',
+        chemistName = chemistName ?? storeName ?? '',
+        mobileNumber = mobileNumber ?? phone ?? '';
+
+  // Backward compatibility getters
+  String get id => chemistcode;
+  String get storeName => chemistName;
+  String get ownerName => empName;
+  String get licenseNo => division;
+  String get locality => region;
+  String get city => hq;
+  String get phone => mobileNumber;
+  String get category => 'A';
+  String get tseEmployeeId => empCode;
 
   factory Chemist.fromJson(Map<String, dynamic> json) {
     return Chemist(
-      id: json['chemistcode'] ?? json['chemistId'] ?? json['id'] ?? '',
-      storeName: json['chemistName'] ?? json['store_name'] ?? '',
-      ownerName: json['empName'] ?? json['owner_name'] ?? '',
-      licenseNo: json['division'] ?? json['license_no'] ?? 'N/A',
-      locality: json['region'] ?? json['locality'] ?? '',
-      city: json['hq'] ?? json['city'] ?? '',
-      phone: json['mobileNumber'] ?? json['phone'] ?? '',
-      category: json['category'] ?? 'A',
-      tseEmployeeId: json['empCode'] ?? json['tse_employee_id'] ?? '',
+      divisionCode: json['divisionCode'] ?? json['division_code'] ?? '',
+      division: json['division'] ?? '',
+      region: json['region'] ?? '',
+      hq: json['hq'] ?? '',
+      empCode: json['empCode'] ?? json['emp_code'] ?? '',
+      empName: json['empName'] ?? json['emp_name'] ?? '',
+      chemistcode: json['chemistcode'] ?? json['chemistCode'] ?? '',
+      chemistName: json['chemistName'] ?? json['chemist_name'] ?? '',
+      mobileNumber: json['mobileNumber'] ?? json['mobile_number'] ?? '',
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'store_name': storeName,
-        'owner_name': ownerName,
-        'license_no': licenseNo,
-        'locality': locality,
-        'city': city,
-        'phone': phone,
-        'category': category,
-        'tse_employee_id': tseEmployeeId,
+        'divisionCode': divisionCode,
+        'division': division,
+        'region': region,
+        'hq': hq,
+        'empCode': empCode,
+        'empName': empName,
+        'chemistcode': chemistcode,
+        'chemistName': chemistName,
+        'mobileNumber': mobileNumber,
       };
 }

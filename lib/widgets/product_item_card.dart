@@ -46,50 +46,74 @@ class ProductItemCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text(
-                  product.skuCode,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: AppColors.textMuted,
-                    fontWeight: FontWeight.w600,
+                Expanded(
+                  child: Text(
+                    'Prod Code: ${product.productCode} • Mat Code: ${product.materialCode}',
+                    style: const TextStyle(
+                      fontSize: 10.5,
+                      color: AppColors.textMuted,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const Spacer(),
-                if (product.inStock)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: AppColors.successLight,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: const Text(
-                      'In Stock',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.success,
-                      ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryLight,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    'Div: ${product.divisionCode}',
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryDark,
                     ),
                   ),
+                ),
               ],
             ),
             const SizedBox(height: 8),
             Text(
-              product.name,
+              product.productName,
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
               ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Pack: ${product.packSize}',
-              style: const TextStyle(
-                fontSize: 12,
-                color: AppColors.textSecondary,
+            if (product.materialName != product.productName && product.materialName.isNotEmpty) ...[
+              const SizedBox(height: 2),
+              Text(
+                'Mat Name: ${product.materialName}',
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
+                ),
               ),
+            ],
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Text(
+                  'Pack Size: ${product.packSize.isNotEmpty ? product.packSize : "N/A"}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  'Unit: ${product.unit.isNotEmpty ? product.unit : "N/A"}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
             ),
 
             const Divider(height: 24),
