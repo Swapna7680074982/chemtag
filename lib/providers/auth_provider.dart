@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import '../models/tse_user.dart';
-import '../services/mock_dcr_service.dart';
+import '../services/api_service.dart';
 
 class AuthProvider with ChangeNotifier {
-  final MockDcrService _apiService = MockDcrService();
+  final ApiService _apiService = ApiService();
 
   TseUser? _currentUser;
   bool _isLoading = false;
   String? _errorMessage;
 
-  TseUser? get currentUser => _currentUser;
-  bool get isAuthenticated => _currentUser != null;
+  TseUser? get currentUser => _currentUser ?? _apiService.currentUser;
+  bool get isAuthenticated => currentUser != null;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
@@ -29,14 +29,15 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = 'Invalid credentials or network error.';
+      _errorMessage = e.toString().replaceFirst('Exception: ', '');
       _isLoading = false;
       notifyListeners();
       return false;
     }
   }
 
-  void logout() {
+  Future<void> logout() async {
+    await _apiService.logout();
     _currentUser = null;
     notifyListeners();
   }

@@ -19,13 +19,13 @@ class TseUser {
 
   factory TseUser.fromJson(Map<String, dynamic> json) {
     return TseUser(
-      employeeId: json['employee_id'] ?? '',
-      name: json['name'] ?? '',
+      employeeId: json['employeeId'] ?? json['employee_id'] ?? '',
+      name: json['employeeName'] ?? json['name'] ?? '',
       email: json['email'] ?? '',
       designation: json['designation'] ?? 'Territory Sales Executive',
-      territory: json['territory'] ?? '',
-      hqCity: json['hq_city'] ?? '',
-      phone: json['phone'] ?? '',
+      territory: json['region'] ?? json['territory'] ?? '',
+      hqCity: json['hq'] ?? json['hq_city'] ?? '',
+      phone: json['mobile'] ?? json['phone'] ?? '',
     );
   }
 

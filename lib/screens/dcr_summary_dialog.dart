@@ -40,8 +40,8 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
 
     final tse = authProvider.currentUser;
     bool success = await dcrProvider.submitDcr(
-      tseEmployeeId: tse?.employeeId ?? 'TSE-10042',
-      tseName: tse?.name ?? 'Nikhita Grover',
+      tseEmployeeId: tse?.employeeId ?? '13995',
+      tseName: tse?.name ?? 'TSE User',
       notes: _notesController.text.trim(),
     );
 

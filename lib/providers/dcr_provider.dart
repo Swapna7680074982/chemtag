@@ -4,11 +4,11 @@ import '../models/stockist.dart';
 import '../models/brand.dart';
 import '../models/product.dart';
 import '../models/dcr_submission.dart';
-import '../services/mock_dcr_service.dart';
+import '../services/api_service.dart';
 import '../core/utils/location_helper.dart';
 
 class DcrProvider with ChangeNotifier {
-  final MockDcrService _apiService = MockDcrService();
+  final ApiService _apiService = ApiService();
   String? _tseEmployeeId;
 
   // Page Sizes for Lazy Loading
@@ -126,8 +126,7 @@ class DcrProvider with ChangeNotifier {
   }
 
   Future<void> _initBrands() async {
-    _brands = await _apiService.getBrands();
-    notifyListeners();
+    // Dynamic brand loading happens after loading products
   }
 
   // --- Step 1: Mapped Chemists ---
@@ -308,6 +307,21 @@ class DcrProvider with ChangeNotifier {
     try {
       _allProductsForStockists = await _apiService
           .getProductsForUser(_tseEmployeeId ?? 'TSE-10042');
+      
+      // Dynamically extract brands (divisions) from fetched products
+      final uniqueDivisions = <String, String>{};
+      for (final p in _allProductsForStockists) {
+        if (p.brandId.isNotEmpty) {
+          uniqueDivisions[p.brandId] = p.brandName;
+        }
+      }
+      _brands = uniqueDivisions.entries.map((e) => Brand(
+        id: e.key,
+        name: e.value,
+        category: 'Division',
+        description: 'Products under ${e.value}',
+      )).toList();
+
       _applyProductFilter();
     } catch (e) {
       _productsError = e.toString();
@@ -473,8 +487,8 @@ class DcrProvider with ChangeNotifier {
     bool success = await _apiService.submitDcrReport(submission);
 
     if (success) {
-      _dcrHistory.insert(0, submission);
-      _initHistoryPagination();
+      // Reload DCR history from backend to get the server-assigned order IDs/No
+      await fetchDcrHistory();
       clearQuantities();
     }
 

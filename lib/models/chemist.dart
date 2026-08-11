@@ -23,15 +23,15 @@ class Chemist {
 
   factory Chemist.fromJson(Map<String, dynamic> json) {
     return Chemist(
-      id: json['id'] ?? '',
-      storeName: json['store_name'] ?? '',
-      ownerName: json['owner_name'] ?? '',
-      licenseNo: json['license_no'] ?? '',
-      locality: json['locality'] ?? '',
-      city: json['city'] ?? '',
-      phone: json['phone'] ?? '',
+      id: json['chemistcode'] ?? json['chemistId'] ?? json['id'] ?? '',
+      storeName: json['chemistName'] ?? json['store_name'] ?? '',
+      ownerName: json['empName'] ?? json['owner_name'] ?? '',
+      licenseNo: json['division'] ?? json['license_no'] ?? 'N/A',
+      locality: json['region'] ?? json['locality'] ?? '',
+      city: json['hq'] ?? json['city'] ?? '',
+      phone: json['mobileNumber'] ?? json['phone'] ?? '',
       category: json['category'] ?? 'A',
-      tseEmployeeId: json['tse_employee_id'] ?? '',
+      tseEmployeeId: json['empCode'] ?? json['tse_employee_id'] ?? '',
     );
   }
 

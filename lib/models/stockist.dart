@@ -21,14 +21,14 @@ class Stockist {
 
   factory Stockist.fromJson(Map<String, dynamic> json) {
     return Stockist(
-      id: json['id'] ?? '',
-      name: json['name'] ?? '',
-      code: json['code'] ?? '',
-      contactPerson: json['contact_person'] ?? '',
-      phone: json['phone'] ?? '',
-      address: json['address'] ?? '',
-      city: json['city'] ?? '',
-      tseEmployeeId: json['tse_employee_id'] ?? '',
+      id: json['stockistSapId'] ?? json['id'] ?? '',
+      name: json['stockistName'] ?? json['name'] ?? '',
+      code: json['stockistSapId'] ?? json['code'] ?? '',
+      contactPerson: json['contactPerson'] ?? json['contact_person'] ?? 'N/A',
+      phone: json['phone'] ?? 'N/A',
+      address: json['hqName'] ?? json['address'] ?? '',
+      city: json['hqName'] ?? json['city'] ?? '',
+      tseEmployeeId: json['tseEmployeeId'] ?? json['tse_employee_id'] ?? '',
     );
   }
 

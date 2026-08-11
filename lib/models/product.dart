@@ -21,12 +21,12 @@ class Product {
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
-      id: json['id'] ?? '',
-      name: json['name'] ?? '',
-      skuCode: json['sku_code'] ?? '',
-      brandId: json['brand_id'] ?? '',
-      brandName: json['brand_name'] ?? '',
-      packSize: json['pack_size'] ?? '',
+      id: json['productId'] ?? json['productCode'] ?? json['id'] ?? '',
+      name: json['productName'] ?? json['materialName'] ?? json['name'] ?? '',
+      skuCode: json['materialCode'] ?? json['sku_code'] ?? '',
+      brandId: json['divisionCode'] ?? json['brand_id'] ?? '',
+      brandName: json['divisionName'] ?? (json['divisionCode'] != null ? "Division ${json['divisionCode']}" : json['brand_name'] ?? ''),
+      packSize: json['packSize'] ?? json['pack_size'] ?? '',
       inStock: json['in_stock'] ?? true,
       tseEmployeeId: json['tse_employee_id'] ?? '',
     );

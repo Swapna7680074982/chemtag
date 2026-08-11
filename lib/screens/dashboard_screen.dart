@@ -6,8 +6,9 @@ import '../providers/dcr_provider.dart';
 import '../widgets/gradient_button.dart';
 import '../core/constants/app_colors.dart';
 import 'chemist_selection_screen.dart';
-// import 'dcr_history_screen.dart';
+import 'dcr_history_screen.dart';
 import 'login_screen.dart';
+import 'system_info_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -254,8 +255,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             const SizedBox(height: 12),
 
-            // View History & Geo Logs Card (Disabled for now per requirement)
-            /*
             _buildActionCard(
               title: 'DCR Reports & Geo-Logs',
               subtitle: 'Review recent daily reports, order details & captured Lat/Lng tags',
@@ -267,7 +266,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 );
               },
             ),
-            */
+            const SizedBox(height: 12),
+
+            _buildActionCard(
+              title: 'Device & API Information',
+              subtitle: 'View device profile metadata & TSE Chemist App API documentation',
+              icon: Icons.info_outline_rounded,
+              iconColor: AppColors.primary,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const SystemInfoScreen()),
+                );
+              },
+            ),
           ],
         ),
       ),
