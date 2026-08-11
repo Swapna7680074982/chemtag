@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/tse_user.dart';
 import '../models/chemist.dart';
 import '../models/stockist.dart';
@@ -41,10 +42,16 @@ class ApiService {
   }
 
   // Clear in-memory state on logout
-  void clearTokens() {
+  Future<void> clearTokens() async {
     _accessToken = null;
     _refreshToken = null;
     _currentUser = null;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('access_token');
+      await prefs.remove('refresh_token');
+      await prefs.remove('current_user');
+    } catch (_) {}
   }
 
   // Header helper for requests
@@ -119,6 +126,14 @@ class ApiService {
         
         final profileMap = dataMap['profile'];
         _currentUser = TseUser.fromJson(profileMap);
+
+        try {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('access_token', _accessToken!);
+          await prefs.setString('refresh_token', _refreshToken!);
+          await prefs.setString('current_user', jsonEncode(_currentUser!.toJson()));
+        } catch (_) {}
+
         return _currentUser!;
       } else {
         throw Exception(data['message'] ?? 'Login failed.');
@@ -151,6 +166,13 @@ class ApiService {
           final dataMap = data['data'];
           _accessToken = dataMap['accessToken'];
           _refreshToken = dataMap['refreshToken'];
+
+          try {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setString('access_token', _accessToken!);
+            await prefs.setString('refresh_token', _refreshToken!);
+          } catch (_) {}
+
           return true;
         }
       }
@@ -158,8 +180,49 @@ class ApiService {
       // Ignore exception and return false to trigger login screen transition
     }
 
-    clearTokens();
+    await clearTokens();
     return false;
+  }
+
+  // AUTO LOGIN VERIFICATION
+  Future<bool> tryAutoLogin() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final cachedAccessToken = prefs.getString('access_token');
+      final cachedRefreshToken = prefs.getString('refresh_token');
+      final cachedUserJson = prefs.getString('current_user');
+
+      if (cachedRefreshToken == null) {
+        return false;
+      }
+
+      _accessToken = cachedAccessToken;
+      _refreshToken = cachedRefreshToken;
+
+      if (cachedUserJson != null) {
+        try {
+          _currentUser = TseUser.fromJson(jsonDecode(cachedUserJson));
+        } catch (_) {}
+      }
+
+      // Verify session via profile API.
+      // If access token is expired, _sendRequest automatically tries to refresh it.
+      final profile = await getProfile();
+      _currentUser = profile;
+      await prefs.setString('current_user', jsonEncode(_currentUser!.toJson()));
+      return true;
+    } catch (_) {
+      // If refreshing/verifying fails, check if tokens were cleared (expired).
+      if (_refreshToken == null) {
+        return false;
+      }
+      // If we still have the refresh token (meaning it was a connection/network error),
+      // we allow access in offline-mode using cached user details.
+      if (_currentUser != null) {
+        return true;
+      }
+      return false;
+    }
   }
 
   // PROFILE API: GET /api/auth/profile
@@ -183,7 +246,7 @@ class ApiService {
   // LOGOUT API: POST /api/auth/logout
   Future<bool> logout() async {
     final tokenToInvalidate = _refreshToken;
-    clearTokens();
+    await clearTokens();
 
     if (tokenToInvalidate == null) return true;
 
@@ -205,8 +268,11 @@ class ApiService {
   }
 
   // CHEMISTS LIST API: GET /api/master/chemists
-  Future<List<Chemist>> getMappedChemists(String tseEmployeeId) async {
-    final response = await _sendRequest('GET', '/api/master/chemists');
+  Future<List<Chemist>> getMappedChemists(String tseEmployeeId, {String? search}) async {
+    final path = search != null && search.trim().isNotEmpty
+        ? '/api/master/chemists?search=${Uri.encodeComponent(search.trim())}'
+        : '/api/master/chemists';
+    final response = await _sendRequest('GET', path);
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -222,8 +288,11 @@ class ApiService {
   }
 
   // STOCKISTS LIST API: GET /api/master/stockists
-  Future<List<Stockist>> getStockistsForUser(String tseEmployeeId) async {
-    final response = await _sendRequest('GET', '/api/master/stockists');
+  Future<List<Stockist>> getStockistsForUser(String tseEmployeeId, {String? search}) async {
+    final path = search != null && search.trim().isNotEmpty
+        ? '/api/master/stockists?search=${Uri.encodeComponent(search.trim())}'
+        : '/api/master/stockists';
+    final response = await _sendRequest('GET', path);
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -239,8 +308,11 @@ class ApiService {
   }
 
   // PRODUCTS LIST API: GET /api/master/products
-  Future<List<Product>> getProductsForUser(String tseEmployeeId) async {
-    final response = await _sendRequest('GET', '/api/master/products');
+  Future<List<Product>> getProductsForUser(String tseEmployeeId, {String? search}) async {
+    final path = search != null && search.trim().isNotEmpty
+        ? '/api/master/products?search=${Uri.encodeComponent(search.trim())}'
+        : '/api/master/products';
+    final response = await _sendRequest('GET', path);
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);

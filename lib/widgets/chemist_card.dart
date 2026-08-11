@@ -120,7 +120,7 @@ class ChemistCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            'Division: ${chemist.division} (Code: ${chemist.divisionCode})',
+                            'Division: ${chemist.division} (Division Code: ${chemist.divisionCode})',
                             style: const TextStyle(
                               fontSize: 11.5,
                               color: AppColors.textSecondary,

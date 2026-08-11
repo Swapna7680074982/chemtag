@@ -6,19 +6,22 @@ import 'providers/dcr_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/dashboard_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const ChemTagApp());
+  final authProvider = AuthProvider();
+  await authProvider.tryAutoLogin();
+  runApp(ChemTagApp(authProvider: authProvider));
 }
 
 class ChemTagApp extends StatelessWidget {
-  const ChemTagApp({super.key});
+  final AuthProvider authProvider;
+  const ChemTagApp({super.key, required this.authProvider});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider.value(value: authProvider),
         ChangeNotifierProvider(create: (_) => DcrProvider()),
       ],
       child: MaterialApp(

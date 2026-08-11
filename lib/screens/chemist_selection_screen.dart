@@ -237,7 +237,44 @@ class _ChemistSelectionScreenState extends State<ChemistSelectionScreen> {
                               onTap: widget.isCatalog
                                   ? null
                                   : () async {
-                                      await dcrProvider.selectChemist(chemist);
+                                      showDialog(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (context) => const Center(
+                                          child: Card(
+                                            child: Padding(
+                                              padding: EdgeInsets.all(20.0),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  CircularProgressIndicator(
+                                                    color: AppColors.primary,
+                                                  ),
+                                                  SizedBox(height: 16),
+                                                  Text(
+                                                    'Loading Stockists & Products...',
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.w600,
+                                                      fontSize: 14,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+
+                                      try {
+                                        await dcrProvider.selectChemist(chemist);
+                                      } catch (e) {
+                                        debugPrint('Error selecting chemist: $e');
+                                      } finally {
+                                        if (context.mounted) {
+                                          Navigator.of(context).pop();
+                                        }
+                                      }
+
                                       if (context.mounted) {
                                         Navigator.of(context).push(
                                           MaterialPageRoute(

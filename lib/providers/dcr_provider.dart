@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import '../models/chemist.dart';
 import '../models/stockist.dart';
 import '../models/brand.dart';
@@ -16,6 +17,10 @@ class DcrProvider with ChangeNotifier {
   static const int _pageSizeStockists = 5;
   static const int _pageSizeProducts = 5;
   static const int _pageSizeHistory = 5;
+
+  Timer? _chemistDebounce;
+  Timer? _stockistDebounce;
+  Timer? _productDebounce;
 
   // Mapped Chemists
   List<Chemist> _mappedChemists = [];
@@ -70,14 +75,14 @@ class DcrProvider with ChangeNotifier {
   bool _isLoadingMoreHistory = false;
 
   // Getters
-  List<Chemist> get chemists => _paginatedChemists;
+  List<Chemist> get chemists => _filteredChemists;
   Chemist? get selectedChemist => _selectedChemist;
   bool get isLoadingChemists => _isLoadingChemists;
   String get chemistSearchQuery => _chemistSearchQuery;
-  bool get hasMoreChemists => _hasMoreChemists;
+  bool get hasMoreChemists => false;
   bool get isLoadingMoreChemists => _isLoadingMoreChemists;
 
-  List<Stockist> get availableStockists => _paginatedStockists;
+  List<Stockist> get availableStockists => _filteredStockists;
   List<Stockist> get allAvailableStockistsRaw => _availableStockists;
   Set<String> get selectedStockistIds => _selectedStockistIds;
   List<Stockist> get selectedStockistsList => _availableStockists
@@ -85,16 +90,16 @@ class DcrProvider with ChangeNotifier {
       .toList();
   String get stockistSearchQuery => _stockistSearchQuery;
   bool get isLoadingStockists => _isLoadingStockists;
-  bool get hasMoreStockists => _hasMoreStockists;
+  bool get hasMoreStockists => false;
   bool get isLoadingMoreStockists => _isLoadingMoreStockists;
 
   List<Brand> get brands => _brands;
   String? get selectedBrandId => _selectedBrandId;
-  List<Product> get products => _paginatedProducts;
+  List<Product> get products => _filteredProducts;
   List<Product> get allProductsForSelectedStockists => _allProductsForStockists;
   String get productSearchQuery => _productSearchQuery;
   bool get isLoadingProducts => _isLoadingProducts;
-  bool get hasMoreProducts => _hasMoreProducts;
+  bool get hasMoreProducts => false;
   bool get isLoadingMoreProducts => _isLoadingMoreProducts;
 
   Map<String, int> get productQuantities => _productQuantities;
@@ -154,6 +159,23 @@ class DcrProvider with ChangeNotifier {
     _chemistSearchQuery = query;
     _applyChemistFilter();
     notifyListeners();
+
+    _chemistDebounce?.cancel();
+    _chemistDebounce = Timer(const Duration(milliseconds: 500), () async {
+      try {
+        final results = await _apiService.getMappedChemists(
+          _tseEmployeeId ?? '',
+          search: query,
+        );
+        if (_chemistSearchQuery == query) {
+          _mappedChemists = results;
+          _applyChemistFilter();
+          notifyListeners();
+        }
+      } catch (e) {
+        debugPrint('Error searching chemists: $e');
+      }
+    });
   }
 
   void _applyChemistFilter() {
@@ -228,6 +250,23 @@ class DcrProvider with ChangeNotifier {
     _stockistSearchQuery = query;
     _applyStockistFilter();
     notifyListeners();
+
+    _stockistDebounce?.cancel();
+    _stockistDebounce = Timer(const Duration(milliseconds: 500), () async {
+      try {
+        final results = await _apiService.getStockistsForUser(
+          _tseEmployeeId ?? '',
+          search: query,
+        );
+        if (_stockistSearchQuery == query) {
+          _availableStockists = results;
+          _applyStockistFilter();
+          notifyListeners();
+        }
+      } catch (e) {
+        debugPrint('Error searching stockists: $e');
+      }
+    });
   }
 
   void _applyStockistFilter() {
@@ -349,6 +388,23 @@ class DcrProvider with ChangeNotifier {
     _productSearchQuery = query;
     _applyProductFilter();
     notifyListeners();
+
+    _productDebounce?.cancel();
+    _productDebounce = Timer(const Duration(milliseconds: 500), () async {
+      try {
+        final results = await _apiService.getProductsForUser(
+          _tseEmployeeId ?? '',
+          search: query,
+        );
+        if (_productSearchQuery == query) {
+          _allProductsForStockists = results;
+          _applyProductFilter();
+          notifyListeners();
+        }
+      } catch (e) {
+        debugPrint('Error searching products: $e');
+      }
+    });
   }
 
   void _applyProductFilter() {
@@ -545,6 +601,9 @@ class DcrProvider with ChangeNotifier {
   }
 
   void resetWorkflow() {
+    _chemistDebounce?.cancel();
+    _stockistDebounce?.cancel();
+    _productDebounce?.cancel();
     _selectedChemist = null;
     _selectedStockistIds.clear();
     _availableStockists.clear();
@@ -567,6 +626,9 @@ class DcrProvider with ChangeNotifier {
   }
 
   void clearAllData() {
+    _chemistDebounce?.cancel();
+    _stockistDebounce?.cancel();
+    _productDebounce?.cancel();
     _mappedChemists = [];
     _filteredChemists = [];
     _paginatedChemists = [];
@@ -611,5 +673,13 @@ class DcrProvider with ChangeNotifier {
     _isLoadingMoreHistory = false;
 
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _chemistDebounce?.cancel();
+    _stockistDebounce?.cancel();
+    _productDebounce?.cancel();
+    super.dispose();
   }
 }

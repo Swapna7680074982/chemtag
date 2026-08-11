@@ -18,6 +18,16 @@ class AuthProvider with ChangeNotifier {
     // _currentUser starts as null so LoginScreen opens first
   }
 
+  Future<bool> tryAutoLogin() async {
+    final success = await _apiService.tryAutoLogin();
+    if (success) {
+      _currentUser = _apiService.currentUser;
+      notifyListeners();
+      return true;
+    }
+    return false;
+  }
+
   Future<bool> login(String employeeId, String password) async {
     _isLoading = true;
     _errorMessage = null;
