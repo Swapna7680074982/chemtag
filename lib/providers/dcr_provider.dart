@@ -190,7 +190,8 @@ class DcrProvider with ChangeNotifier {
         return c.storeName.toLowerCase().contains(q) ||
             c.ownerName.toLowerCase().contains(q) ||
             c.locality.toLowerCase().contains(q) ||
-            c.licenseNo.toLowerCase().contains(q);
+            c.licenseNo.toLowerCase().contains(q) ||
+            c.chemistcode.toLowerCase().contains(q);
       }).toList();
     }
     _initChemistsPagination();
@@ -492,6 +493,7 @@ class DcrProvider with ChangeNotifier {
     required String tseName,
     String notes = '',
   }) async {
+    if (_isSubmitting) return false;
     if (_selectedChemist == null || _selectedStockistIds.isEmpty) return false;
 
     _isSubmitting = true;
@@ -603,6 +605,8 @@ class DcrProvider with ChangeNotifier {
       _filteredHistory = _dcrHistory.where((s) {
         // Chemist store name
         if (s.chemist.storeName.toLowerCase().contains(q)) return true;
+        // Chemist code
+        if (s.chemist.chemistcode.toLowerCase().contains(q)) return true;
         // Order ID
         if (s.id.toLowerCase().contains(q)) return true;
         // Stockist name/code

@@ -354,12 +354,6 @@ class _DcrHistoryScreenState extends State<DcrHistoryScreen> {
                                       color: AppColors.textSecondary,
                                     ),
                                     children: [
-                                      const TextSpan(text: 'Code: '),
-                                      TextSpan(
-                                        text: item.productId,
-                                        style: const TextStyle(fontWeight: FontWeight.w500),
-                                      ),
-                                      const TextSpan(text: ' • '),
                                       TextSpan(
                                         text: item.productName.trim(),
                                         style: const TextStyle(
@@ -433,12 +427,6 @@ class _DcrHistoryScreenState extends State<DcrHistoryScreen> {
                               color: AppColors.textSecondary,
                             ),
                             children: [
-                              const TextSpan(text: 'Code: '),
-                              TextSpan(
-                                text: item.productId,
-                                style: const TextStyle(fontWeight: FontWeight.w500),
-                              ),
-                              const TextSpan(text: ' • '),
                               TextSpan(
                                 text: item.productName.trim(),
                                 style: const TextStyle(

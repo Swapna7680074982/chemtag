@@ -34,8 +34,10 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
   }
 
   void _handleSubmit() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final dcrProvider = Provider.of<DcrProvider>(context, listen: false);
+    if (dcrProvider.isSubmitting) return;
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final navigator = Navigator.of(context);
 
     final tse = authProvider.currentUser;

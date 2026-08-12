@@ -66,6 +66,7 @@ class ChemistCard extends StatelessWidget {
                             ),
                           ),
                         ),
+                        const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 6, vertical: 2),
@@ -87,7 +88,7 @@ class ChemistCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'TSE/MR: ${chemist.empName} (Code: ${chemist.empCode})',
+                      'TSE/MR: ${chemist.empName}',
                       style: const TextStyle(
                         fontSize: 12.5,
                         color: AppColors.textSecondary,
@@ -120,7 +121,7 @@ class ChemistCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            'Division: ${chemist.division} (Division Code: ${chemist.divisionCode})',
+                            'Division: ${chemist.division}',
                             style: const TextStyle(
                               fontSize: 11.5,
                               color: AppColors.textSecondary,

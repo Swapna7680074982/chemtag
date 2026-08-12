@@ -303,20 +303,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             const SizedBox(height: 12),
 
-            // View Mapped Chemists Card
-            _buildActionCard(
-              title: 'Mapped Chemists Catalog',
-              subtitle: 'View chemists assigned to Employee ID ${user?.employeeId ?? ""}',
-              icon: Icons.store_mall_directory_outlined,
-              iconColor: AppColors.primary,
-              onTap: () {
-                dcrProvider.resetWorkflow();
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const ChemistSelectionScreen(isCatalog: true)),
-                );
-              },
-            ),
-            const SizedBox(height: 12),
+
 
             _buildActionCard(
               title: 'DCR Reports & Geo-Logs',

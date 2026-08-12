@@ -96,7 +96,7 @@ class _ChemistSelectionScreenState extends State<ChemistSelectionScreen> {
             CustomTextField(
               controller: _searchController,
               labelText: 'Search Mapped Chemists',
-              hintText: 'Search by store name, owner, locality, or DL No...',
+              hintText: 'Search by code, store name, owner, locality, or DL No...',
               prefixIcon: Icons.search,
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
@@ -126,8 +126,6 @@ class _ChemistSelectionScreenState extends State<ChemistSelectionScreen> {
                     color: AppColors.textSecondary,
                   ),
                 ),
-                const Spacer(),
-                const Icon(Icons.tune, size: 16, color: AppColors.textMuted),
               ],
             ),
             const SizedBox(height: 12),
