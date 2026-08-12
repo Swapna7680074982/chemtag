@@ -75,7 +75,7 @@ class DcrSubmission {
   int get totalQuantity => items.fold(0, (sum, item) => sum + item.quantity);
 
   factory DcrSubmission.fromJson(Map<String, dynamic> json) {
-    final chemistMap = json['chemist'];
+    final chemistMap = json['chemistDetails'] ?? json['chemist'];
     Chemist chemistObj;
     if (chemistMap is Map<String, dynamic>) {
       chemistObj = Chemist.fromJson(chemistMap);
@@ -93,7 +93,7 @@ class DcrSubmission {
       );
     }
 
-    final locationMap = json['location'];
+    final locationMap = json['locationDetails'] ?? json['location'];
     double lat = 0.0;
     double lng = 0.0;
     double acc = 0.0;
@@ -107,7 +107,22 @@ class DcrSubmission {
       acc = (json['accuracy_meters'] as num?)?.toDouble() ?? 10.0;
     }
 
-    final submittedAtStr = json['submittedAt'] ?? json['submitted_at'] ?? '';
+    final orderDetails = json['orderDetails'];
+    String orderId = '';
+    String orderNo = '';
+    String remarks = '';
+    String submittedAtStr = '';
+    if (orderDetails is Map<String, dynamic>) {
+      orderId = orderDetails['orderId']?.toString() ?? '';
+      orderNo = orderDetails['orderNo'] ?? '';
+      remarks = orderDetails['remarks'] ?? '';
+      submittedAtStr = orderDetails['submittedAt'] ?? '';
+    } else {
+      orderNo = json['orderNo'] ?? json['id'] ?? json['orderId']?.toString() ?? '';
+      remarks = json['remarks'] ?? json['notes'] ?? '';
+      submittedAtStr = json['submittedAt'] ?? json['submitted_at'] ?? '';
+    }
+
     DateTime submittedDate;
     try {
       submittedDate = DateTime.parse(submittedAtStr);
@@ -115,18 +130,53 @@ class DcrSubmission {
       submittedDate = DateTime.now();
     }
 
-    final itemsRaw = json['items'] as List?;
-    final itemsList = itemsRaw != null
-        ? itemsRaw.map((i) => DcrItem.fromJson(i as Map<String, dynamic>)).toList()
-        : <DcrItem>[];
+    final stockistsList = <Stockist>[];
+    final itemsList = <DcrItem>[];
 
-    final stockistsRaw = json['stockists'] as List?;
-    final stockistsList = stockistsRaw != null
-        ? stockistsRaw.map((s) => Stockist.fromJson(s as Map<String, dynamic>)).toList()
-        : <Stockist>[];
+    // Check if new structure is present inside chemistDetails:
+    final chemistDetails = json['chemistDetails'];
+    if (chemistDetails is Map<String, dynamic> && chemistDetails['stockistDetails'] is List) {
+      final stockistDetailsList = chemistDetails['stockistDetails'] as List;
+      for (final sObj in stockistDetailsList) {
+        if (sObj is Map<String, dynamic>) {
+          final stockist = Stockist.fromJson(sObj);
+          stockistsList.add(stockist);
+
+          final productDetailsList = sObj['productDetails'];
+          if (productDetailsList is List) {
+            for (final pObj in productDetailsList) {
+              if (pObj is Map<String, dynamic>) {
+                final item = DcrItem(
+                  productId: pObj['productId'] ?? pObj['product_id'] ?? pObj['materialCode'] ?? '',
+                  productName: pObj['productName'] ?? pObj['product_name'] ?? pObj['materialName'] ?? '',
+                  brandName: pObj['brandName'] ?? pObj['brand_name'] ?? pObj['divisionCode'] ?? '',
+                  packSize: pObj['packSize']?.toString() ?? pObj['pack_size']?.toString() ?? '',
+                  quantity: pObj['quantity'] is int 
+                      ? pObj['quantity'] 
+                      : int.tryParse(pObj['quantity']?.toString() ?? '0') ?? 0,
+                  stockistId: stockist.id,
+                  stockistName: stockist.name,
+                );
+                itemsList.add(item);
+              }
+            }
+          }
+        }
+      }
+    } else {
+      final itemsRaw = json['items'] as List?;
+      if (itemsRaw != null) {
+        itemsList.addAll(itemsRaw.map((i) => DcrItem.fromJson(i as Map<String, dynamic>)));
+      }
+
+      final stockistsRaw = json['stockists'] as List?;
+      if (stockistsRaw != null) {
+        stockistsList.addAll(stockistsRaw.map((s) => Stockist.fromJson(s as Map<String, dynamic>)));
+      }
+    }
 
     return DcrSubmission(
-      id: json['orderNo'] ?? json['id'] ?? json['orderId']?.toString() ?? '',
+      id: orderNo.isNotEmpty ? orderNo : (orderId.isNotEmpty ? orderId : 'DCR-SUBMISSION'),
       tseEmployeeId: json['tse_employee_id'] ?? '',
       tseName: json['tse_name'] ?? '',
       chemist: chemistObj,
@@ -136,7 +186,7 @@ class DcrSubmission {
       longitude: lng,
       accuracyMeters: acc,
       submittedAt: submittedDate,
-      notes: json['remarks'] ?? json['notes'] ?? '',
+      notes: remarks,
     );
   }
 

@@ -335,22 +335,59 @@ class _DcrHistoryScreenState extends State<DcrHistoryScreen> {
                     else
                       ...items.map((item) {
                         return Padding(
-                          padding: const EdgeInsets.only(left: 20, top: 2, bottom: 2),
+                          padding: const EdgeInsets.only(left: 20, top: 4, bottom: 4),
                           child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               const Text(
                                 '• ',
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 14,
                                   color: AppColors.textSecondary,
                                 ),
                               ),
                               Expanded(
-                                child: Text(
-                                  'Code: ${item.productId} • ${item.productName.trim()} - ${item.quantity} Qty',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 12,
-                                    color: AppColors.textSecondary,
+                                child: Text.rich(
+                                  TextSpan(
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                    children: [
+                                      const TextSpan(text: 'Code: '),
+                                      TextSpan(
+                                        text: item.productId,
+                                        style: const TextStyle(fontWeight: FontWeight.w500),
+                                      ),
+                                      const TextSpan(text: ' • '),
+                                      TextSpan(
+                                        text: item.productName.trim(),
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                      const TextSpan(text: '   '),
+                                      WidgetSpan(
+                                        alignment: PlaceholderAlignment.middle,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.primaryLight,
+                                            borderRadius: BorderRadius.circular(6),
+                                            border: Border.all(color: AppColors.primaryBorder),
+                                          ),
+                                          child: Text(
+                                            '${item.quantity} Qty',
+                                            style: const TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w800,
+                                              color: AppColors.primary,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -377,22 +414,59 @@ class _DcrHistoryScreenState extends State<DcrHistoryScreen> {
               const SizedBox(height: 4),
               ...unassignedProducts.map((item) {
                 return Padding(
-                  padding: const EdgeInsets.only(left: 20, top: 2, bottom: 2),
+                  padding: const EdgeInsets.only(left: 20, top: 4, bottom: 4),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const Text(
                         '• ',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 14,
                           color: AppColors.textSecondary,
                         ),
                       ),
                       Expanded(
-                        child: Text(
-                          'Code: ${item.productId} • ${item.productName.trim()} - ${item.quantity} Qty',
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            color: AppColors.textSecondary,
+                        child: Text.rich(
+                          TextSpan(
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
+                            ),
+                            children: [
+                              const TextSpan(text: 'Code: '),
+                              TextSpan(
+                                text: item.productId,
+                                style: const TextStyle(fontWeight: FontWeight.w500),
+                              ),
+                              const TextSpan(text: ' • '),
+                              TextSpan(
+                                text: item.productName.trim(),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              const TextSpan(text: '   '),
+                              WidgetSpan(
+                                alignment: PlaceholderAlignment.middle,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primaryLight,
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(color: AppColors.primaryBorder),
+                                  ),
+                                  child: Text(
+                                    '${item.quantity} Qty',
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
