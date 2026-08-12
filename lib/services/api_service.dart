@@ -356,15 +356,32 @@ class ApiService {
 
   // SUBMIT STOCKS API: POST /api/stocks/submit
   Future<bool> submitDcrReport(DcrSubmission submission) async {
+    final List<Map<String, dynamic>> stockistsPayload = [];
+    for (final stockist in submission.selectedStockists) {
+      final products = submission.items
+          .where((item) => item.stockistId == stockist.id)
+          .map((item) => {
+                'materialCode': item.productId,
+                'quantity': item.quantity,
+              })
+          .toList();
+      
+      if (products.isNotEmpty) {
+        stockistsPayload.add({
+          'stockistSapId': stockist.id,
+          'products': products,
+        });
+      }
+    }
+
     final payload = {
       'chemistCode': submission.chemist.id,
-      'stockistSapIds': submission.selectedStockists.map((s) => s.id).toList(),
-      'items': submission.items.map((i) => {
-        'materialCode': i.productId,
-        'quantity': i.quantity,
-      }).toList(),
+      'stockists': stockistsPayload,
       'latitude': submission.latitude,
       'longitude': submission.longitude,
+      'gpsAccuracyMeters': submission.accuracyMeters,
+      'locationCapturedAt': _formatDateTimeWithOffset(submission.submittedAt),
+      'remarks': submission.notes,
     };
 
     final response = await _sendRequest(
@@ -380,6 +397,19 @@ class ApiService {
       throw Exception(_getErrorMessage(response, defaultMessage: 'Server error during DCR submission'));
     }
   }
+
+  String _formatDateTimeWithOffset(DateTime dt) {
+    if (dt.isUtc) {
+      return dt.toIso8601String();
+    }
+    final offset = dt.timeZoneOffset;
+    final hours = offset.inHours.abs().toString().padLeft(2, '0');
+    final minutes = (offset.inMinutes.abs() % 60).toString().padLeft(2, '0');
+    final sign = offset.isNegative ? '-' : '+';
+    final base = dt.toIso8601String().split('.').first;
+    return '$base$sign$hours:$minutes';
+  }
+
 
   // SUBMITTED STOCKS API: POST /api/stocks/submitted
   Future<List<DcrSubmission>> getDcrHistory() async {
