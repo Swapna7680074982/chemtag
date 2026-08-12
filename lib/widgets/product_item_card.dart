@@ -44,39 +44,15 @@ class ProductItemCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Prod Code: ${product.productCode} • Mat Code: ${product.materialCode}',
-                    style: const TextStyle(
-                      fontSize: 10.5,
-                      color: AppColors.textMuted,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryLight,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    'Div: ${product.divisionCode}',
-                    style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primaryDark,
-                    ),
-                  ),
-                ),
-              ],
+            Text(
+              'Prod Code: ${product.productCode}',
+              style: const TextStyle(
+                fontSize: 11,
+                color: AppColors.textMuted,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               product.productName,
               style: const TextStyle(
@@ -84,36 +60,6 @@ class ProductItemCard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
               ),
-            ),
-            if (product.materialName != product.productName && product.materialName.isNotEmpty) ...[
-              const SizedBox(height: 2),
-              Text(
-                'Mat Name: ${product.materialName}',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Text(
-                  'Pack Size: ${product.packSize.isNotEmpty ? product.packSize : "N/A"}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  'Unit: ${product.unit.isNotEmpty ? product.unit : "N/A"}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
             ),
 
             const Divider(height: 24),

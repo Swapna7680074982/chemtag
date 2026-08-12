@@ -16,6 +16,9 @@ class ApiService {
 
   static const String baseUrl = 'https://services.heterohcl.com/chemist-app';
 
+  // Callback when session expires
+  void Function()? onSessionExpired;
+
   String? _accessToken;
   String? _refreshToken;
   TseUser? _currentUser;
@@ -84,9 +87,12 @@ class ApiService {
     print('API Request ($method $urlPath) Response Status: ${response.statusCode}');
     print('API Request ($method $urlPath) Response Body: ${response.body}');
 
-    // Check if token expired (401) and we have a refresh token
-    if (response.statusCode == 401 && _refreshToken != null) {
-      final refreshSuccess = await refreshSessionToken();
+    // Check if token expired (401)
+    if (response.statusCode == 401) {
+      bool refreshSuccess = false;
+      if (_refreshToken != null) {
+        refreshSuccess = await refreshSessionToken();
+      }
       if (refreshSuccess) {
         // Re-get headers with the updated access token
         final retryHeaders = _getHeaders();
@@ -98,6 +104,10 @@ class ApiService {
         }
         print('API Retry Request ($method $urlPath) Response Status: ${response.statusCode}');
         print('API Retry Request ($method $urlPath) Response Body: ${response.body}');
+      } else {
+        // Clear tokens and trigger session expired callback
+        await clearTokens();
+        onSessionExpired?.call();
       }
     }
 
@@ -371,9 +381,9 @@ class ApiService {
     }
   }
 
-  // SUBMITTED STOCKS API: GET /api/stocks/submitted
+  // SUBMITTED STOCKS API: POST /api/stocks/submitted
   Future<List<DcrSubmission>> getDcrHistory() async {
-    final response = await _sendRequest('GET', '/api/stocks/submitted');
+    final response = await _sendRequest('POST', '/api/stocks/submitted', body: {});
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);

@@ -69,7 +69,9 @@ class DcrProvider with ChangeNotifier {
 
   // DCR History
   List<DcrSubmission> _dcrHistory = [];
+  List<DcrSubmission> _filteredHistory = [];
   List<DcrSubmission> _paginatedHistory = [];
+  String _historySearchQuery = '';
   bool _isLoadingHistory = false;
   bool _hasMoreHistory = true;
   bool _isLoadingMoreHistory = false;
@@ -109,6 +111,7 @@ class DcrProvider with ChangeNotifier {
   bool get isSubmitting => _isSubmitting;
 
   List<DcrSubmission> get dcrHistory => _paginatedHistory;
+  String get historySearchQuery => _historySearchQuery;
   bool get isLoadingHistory => _isLoadingHistory;
   bool get hasMoreHistory => _hasMoreHistory;
   bool get isLoadingMoreHistory => _isLoadingMoreHistory;
@@ -574,10 +577,11 @@ class DcrProvider with ChangeNotifier {
 
     try {
       _dcrHistory = await _apiService.getDcrHistory();
-      _initHistoryPagination();
+      _applyHistoryFilter();
     } catch (e) {
       _historyError = e.toString().replaceFirst('Exception: ', '');
       _dcrHistory = [];
+      _filteredHistory = [];
       _paginatedHistory = [];
     } finally {
       _isLoadingHistory = false;
@@ -585,9 +589,39 @@ class DcrProvider with ChangeNotifier {
     }
   }
 
+  void filterHistory(String query) {
+    _historySearchQuery = query;
+    _applyHistoryFilter();
+    notifyListeners();
+  }
+
+  void _applyHistoryFilter() {
+    if (_historySearchQuery.trim().isEmpty) {
+      _filteredHistory = List.from(_dcrHistory);
+    } else {
+      final q = _historySearchQuery.toLowerCase().trim();
+      _filteredHistory = _dcrHistory.where((s) {
+        // Chemist store name
+        if (s.chemist.storeName.toLowerCase().contains(q)) return true;
+        // Order ID
+        if (s.id.toLowerCase().contains(q)) return true;
+        // Stockist name/code
+        final matchesStockist = s.selectedStockists.any(
+            (st) => st.name.toLowerCase().contains(q) || st.code.toLowerCase().contains(q));
+        if (matchesStockist) return true;
+        // Product name
+        final matchesProduct = s.items.any(
+            (item) => item.productName.toLowerCase().contains(q));
+        if (matchesProduct) return true;
+        return false;
+      }).toList();
+    }
+    _initHistoryPagination();
+  }
+
   void _initHistoryPagination() {
-    _paginatedHistory = _dcrHistory.take(_pageSizeHistory).toList();
-    _hasMoreHistory = _dcrHistory.length > _paginatedHistory.length;
+    _paginatedHistory = _filteredHistory.take(_pageSizeHistory).toList();
+    _hasMoreHistory = _filteredHistory.length > _paginatedHistory.length;
     _isLoadingMoreHistory = false;
   }
 
@@ -599,9 +633,9 @@ class DcrProvider with ChangeNotifier {
     await Future.delayed(const Duration(milliseconds: 500));
 
     final currentLength = _paginatedHistory.length;
-    final nextBatch = _dcrHistory.skip(currentLength).take(_pageSizeHistory);
+    final nextBatch = _filteredHistory.skip(currentLength).take(_pageSizeHistory);
     _paginatedHistory.addAll(nextBatch);
-    _hasMoreHistory = _dcrHistory.length > _paginatedHistory.length;
+    _hasMoreHistory = _filteredHistory.length > _paginatedHistory.length;
     _isLoadingMoreHistory = false;
     notifyListeners();
   }
@@ -623,11 +657,14 @@ class DcrProvider with ChangeNotifier {
     _productSearchQuery = '';
     _chemistSearchQuery = '';
     _stockistSearchQuery = '';
+    _historySearchQuery = '';
+    _filteredHistory = List.from(_dcrHistory);
     _currentLocation = null;
     _chemistsError = null;
     _stockistsError = null;
     _productsError = null;
     _historyError = null;
+    _initHistoryPagination();
     notifyListeners();
   }
 
@@ -673,7 +710,9 @@ class DcrProvider with ChangeNotifier {
     _isSubmitting = false;
 
     _dcrHistory = [];
+    _filteredHistory = [];
     _paginatedHistory = [];
+    _historySearchQuery = '';
     _isLoadingHistory = false;
     _hasMoreHistory = true;
     _isLoadingMoreHistory = false;

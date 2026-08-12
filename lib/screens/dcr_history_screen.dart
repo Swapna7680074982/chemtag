@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/dcr_provider.dart';
 import '../models/dcr_submission.dart';
+import '../models/stockist.dart';
 import '../core/constants/app_colors.dart';
 import '../core/utils/formatters.dart';
 
@@ -15,6 +16,7 @@ class DcrHistoryScreen extends StatefulWidget {
 
 class _DcrHistoryScreenState extends State<DcrHistoryScreen> {
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -29,6 +31,7 @@ class _DcrHistoryScreenState extends State<DcrHistoryScreen> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -61,236 +64,345 @@ class _DcrHistoryScreenState extends State<DcrHistoryScreen> {
           ),
         ),
       ),
-      body: dcrProvider.isLoadingHistory
-          ? const Center(child: CircularProgressIndicator())
-          : dcrProvider.dcrHistory.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.history_toggle_off_rounded,
-                        size: 64,
-                        color: AppColors.textMuted,
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'No DCR Submissions Logged Yet',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      const Text(
-                        'Start a new chemist DCR call from the home dashboard to record call entries.',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textSecondary,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                )
-              : ListView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.all(16),
-                  itemCount: dcrProvider.dcrHistory.length +
-                      (dcrProvider.hasMoreHistory ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index == dcrProvider.dcrHistory.length) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      );
-                    }
-
-                    final submission = dcrProvider.dcrHistory[index];
-                    return _buildSubmissionCard(context, submission);
-                  },
+      body: Column(
+        children: [
+          // Search Bar
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                dcrProvider.filterHistory(value);
+              },
+              decoration: InputDecoration(
+                hintText: 'Search by chemist, stockist, product...',
+                hintStyle: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: AppColors.textMuted,
                 ),
+                prefixIcon: const Icon(
+                  Icons.search_rounded,
+                  color: AppColors.textSecondary,
+                  size: 20,
+                ),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear_rounded, size: 20),
+                        onPressed: () {
+                          _searchController.clear();
+                          dcrProvider.filterHistory('');
+                        },
+                      )
+                    : null,
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppColors.border),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppColors.border),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: dcrProvider.isLoadingHistory
+                ? const Center(child: CircularProgressIndicator())
+                : dcrProvider.dcrHistory.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.history_toggle_off_rounded,
+                              size: 64,
+                              color: AppColors.textMuted,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              dcrProvider.historySearchQuery.isNotEmpty
+                                  ? 'No Matching Submissions Found'
+                                  : 'No DCR Submissions Logged Yet',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              dcrProvider.historySearchQuery.isNotEmpty
+                                  ? 'Try refining your search query.'
+                                  : 'Start a new chemist DCR call from the home dashboard to record call entries.',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                        itemCount: dcrProvider.dcrHistory.length +
+                            (dcrProvider.hasMoreHistory ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          if (index == dcrProvider.dcrHistory.length) {
+                            return const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            );
+                          }
+
+                          final submission = dcrProvider.dcrHistory[index];
+                          return _buildSubmissionCard(context, submission);
+                        },
+                      ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildSubmissionCard(BuildContext context, DcrSubmission submission) {
+    // Group products by their stockist name
+    final Map<String, List<DcrItem>> stockistProducts = {};
+    for (var stockist in submission.selectedStockists) {
+      stockistProducts[stockist.name] = [];
+    }
+
+    final List<DcrItem> unassignedProducts = [];
+    for (var item in submission.items) {
+      final sName = item.stockistName.trim();
+      if (sName.isNotEmpty && stockistProducts.containsKey(sName)) {
+        stockistProducts[sName]!.add(item);
+      } else {
+        // Fallback: try to find a stockist with matching name in selectedStockists
+        final match = submission.selectedStockists.firstWhere(
+          (s) => s.name.toLowerCase() == sName.toLowerCase(),
+          orElse: () => Stockist(id: '', name: ''),
+        );
+        if (match.name.isNotEmpty) {
+          stockistProducts[match.name]!.add(item);
+        } else if (submission.selectedStockists.length == 1) {
+          // If only one stockist was selected, assign all items to it
+          stockistProducts[submission.selectedStockists.first.name]!.add(item);
+        } else {
+          unassignedProducts.add(item);
+        }
+      }
+    }
+
     return Card(
       margin: const EdgeInsets.only(bottom: 14),
+      elevation: 1,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         side: const BorderSide(color: AppColors.border),
       ),
-      child: ExpansionTile(
-        tilePadding: const EdgeInsets.all(14),
-        leading: Container(
-          width: 44,
-          height: 44,
-          decoration: const BoxDecoration(
-            color: AppColors.successLight,
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.pin_drop_rounded,
-            color: AppColors.success,
-            size: 24,
-          ),
-        ),
-        title: Row(
-          children: [
-            Expanded(
-              child: Text(
-                submission.chemist.storeName,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: AppColors.border),
-              ),
-              child: Text(
-                submission.id,
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryDark,
-                ),
-              ),
-            ),
-          ],
-        ),
-        subtitle: Column(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 4),
+            // Chemist name
             Text(
-              'TSE: ${submission.tseName} (${submission.tseEmployeeId})',
-              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              AppFormatters.formatDateTime(submission.submittedAt),
-              style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+              submission.chemist.storeName,
+              style: GoogleFonts.inter(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
             ),
             const SizedBox(height: 8),
-            // Location Badge
+
+            // Metadata Row: Order ID and Submission Date & Time
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Icon(Icons.my_location, size: 13, color: AppColors.primary),
-                const SizedBox(width: 4),
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryLight,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: AppColors.primaryBorder),
+                    ),
+                    child: Text(
+                      submission.id,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryDark,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
                 Text(
-                  '${submission.latitude.toStringAsFixed(5)}°, ${submission.longitude.toStringAsFixed(5)}° (±${submission.accuracyMeters.toStringAsFixed(1)}m)',
+                  AppFormatters.formatDateTime(submission.submittedAt),
                   style: const TextStyle(
                     fontSize: 11,
+                    color: AppColors.textMuted,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+
+            // Latitude and Longitude
+            Row(
+              children: [
+                const Icon(
+                  Icons.my_location,
+                  size: 13,
+                  color: AppColors.primary,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '${submission.latitude.toStringAsFixed(5)}°, ${submission.longitude.toStringAsFixed(5)}°',
+                  style: const TextStyle(
+                    fontSize: 11.5,
                     fontWeight: FontWeight.w600,
                     color: AppColors.primaryDark,
                   ),
                 ),
               ],
             ),
-          ],
-        ),
-        children: [
-          const Divider(height: 16),
-          Padding(
-            padding: const EdgeInsets.all(14.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Stockists
-                const Text(
-                  'Selected Stockists:',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  submission.selectedStockists
-                      .map((s) => '${s.name} (${s.code})')
-                      .join(', '),
-                  style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
-                ),
-                const SizedBox(height: 12),
+            const Divider(height: 20, thickness: 1, color: AppColors.border),
 
-                // Order Table Header
-                const Text(
-                  'Ordered Products & Quantities:',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                ...submission.items.map((item) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Row(
+            // Selected Stockists and products
+            ...stockistProducts.entries.map((entry) {
+              final stockistName = entry.key;
+              final items = entry.value;
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Stockist Name
+                    Row(
                       children: [
+                        const Icon(
+                          Icons.local_shipping_outlined,
+                          size: 14,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: 6),
                         Expanded(
                           child: Text(
-                            '• ${item.productName} (${item.packSize}) [Distributor: ${item.stockistName}]',
-                            style: const TextStyle(
+                            stockistName,
+                            style: GoogleFonts.inter(
                               fontSize: 12,
+                              fontWeight: FontWeight.bold,
                               color: AppColors.textPrimary,
                             ),
                           ),
                         ),
-                        Text(
-                          '${item.quantity} Qty',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
                       ],
                     ),
-                  );
-                }),
-                const Divider(height: 16),
-
-                // Total Summary
-                Row(
-                  children: [
-                    Text(
-                      'Total Quantity: ${submission.totalQuantity} Units',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    const SizedBox(height: 4),
+                    // Products list
+                    if (items.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Text(
+                          'No products selected',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontStyle: FontStyle.italic,
+                            color: AppColors.textMuted,
+                          ),
+                        ),
+                      )
+                    else
+                      ...items.map((item) {
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 20, top: 2, bottom: 2),
+                          child: Row(
+                            children: [
+                              const Text(
+                                '• ',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  'Code: ${item.productId} • ${item.productName.trim()} - ${item.quantity} Qty',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
                   ],
                 ),
-                if (submission.notes.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    'Notes: ${submission.notes}',
-                    style: const TextStyle(
-                      fontSize: 11,
-                      fontStyle: FontStyle.italic,
-                      color: AppColors.textSecondary,
-                    ),
+              );
+            }),
+
+            // Unassigned products if any
+            if (unassignedProducts.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                'Other Products',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 4),
+              ...unassignedProducts.map((item) {
+                return Padding(
+                  padding: const EdgeInsets.only(left: 20, top: 2, bottom: 2),
+                  child: Row(
+                    children: [
+                      const Text(
+                        '• ',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          'Code: ${item.productId} • ${item.productName.trim()} - ${item.quantity} Qty',
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ]
-              ],
-            ),
-          ),
-        ],
+                );
+              }),
+            ],
+          ],
+        ),
       ),
     );
   }

@@ -380,7 +380,7 @@ class _DcrSummaryDialogState extends State<DcrSummaryDialog> {
                                             ),
                                             const SizedBox(height: 2),
                                             Text(
-                                              'Pack: ${product.packSize}',
+                                              'Code: ${product.productCode}',
                                               style: const TextStyle(
                                                 fontSize: 11,
                                                 color: AppColors.textMuted,
