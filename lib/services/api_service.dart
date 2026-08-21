@@ -1,4 +1,5 @@
 // ignore_for_file: avoid_print
+import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -69,6 +70,24 @@ class ApiService {
     return headers;
   }
 
+  Future<http.Response> _executeWithTimeout(Future<http.Response> Function() requestFn) async {
+    try {
+      return await requestFn().timeout(const Duration(seconds: 15));
+    } catch (e) {
+      if (e is TimeoutException) {
+        throw Exception('Connection timed out. Please check your internet connection or try again.');
+      }
+      final errStr = e.toString();
+      if (errStr.contains('SocketException') || errStr.contains('HandshakeException')) {
+        throw Exception('Server is unreachable. Please check your internet connection.');
+      }
+      if (errStr.contains('ClientException')) {
+        throw Exception('Network connection error. Please try again.');
+      }
+      rethrow;
+    }
+  }
+
   // Base HTTP Request wrapper with auto-token-refresh retry
   Future<http.Response> _sendRequest(String method, String urlPath, {dynamic body}) async {
     final uri = Uri.parse('$baseUrl$urlPath');
@@ -79,9 +98,9 @@ class ApiService {
     
     // Perform initial request
     if (method == 'POST') {
-      response = await http.post(uri, headers: headers, body: encodedBody);
+      response = await _executeWithTimeout(() => http.post(uri, headers: headers, body: encodedBody));
     } else {
-      response = await http.get(uri, headers: headers);
+      response = await _executeWithTimeout(() => http.get(uri, headers: headers));
     }
 
     print('API Request ($method $urlPath) Response Status: ${response.statusCode}');
@@ -98,9 +117,9 @@ class ApiService {
         final retryHeaders = _getHeaders();
         // Retry the request once
         if (method == 'POST') {
-          response = await http.post(uri, headers: retryHeaders, body: encodedBody);
+          response = await _executeWithTimeout(() => http.post(uri, headers: retryHeaders, body: encodedBody));
         } else {
-          response = await http.get(uri, headers: retryHeaders);
+          response = await _executeWithTimeout(() => http.get(uri, headers: retryHeaders));
         }
         print('API Retry Request ($method $urlPath) Response Status: ${response.statusCode}');
         print('API Retry Request ($method $urlPath) Response Body: ${response.body}');
@@ -127,11 +146,11 @@ class ApiService {
       'appVersion': _appVersion,
     };
 
-    final response = await http.post(
+    final response = await _executeWithTimeout(() => http.post(
       uri,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(payload),
-    );
+    ));
 
     print('Login Response Status: ${response.statusCode}');
     print('Login Response Body: ${response.body}');
@@ -173,11 +192,11 @@ class ApiService {
     };
 
     try {
-      final response = await http.post(
+      final response = await _executeWithTimeout(() => http.post(
         uri,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(payload),
-      );
+      ));
 
       print('Refresh Token Response Status: ${response.statusCode}');
       print('Refresh Token Response Body: ${response.body}');
